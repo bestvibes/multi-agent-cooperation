@@ -24,10 +24,10 @@ def reward_11_by_11_2d_grid(state: tuple, action: int, next_state: tuple) -> flo
     else:
         return -chaser_chasee_dist
 
-def transition_11_by_11_2d_grid(state: tuple, action: int) -> tuple:
-    grid_x_bounds = (-5, 5)
-    grid_y_bounds = (-5, 5)
-
+def transition_11_by_11_2d_grid(state_space: tuple, state: tuple, action: int) -> tuple:
+    grid_x_bounds = state_space[0] #(-5, 5)
+    grid_y_bounds = state_space[1] #(-5, 5)
+    
     current_chaser_state = state[0]
     current_chasee_state = state[1]
 
@@ -67,6 +67,17 @@ class TestEnvInit(unittest.TestCase):
                             transition_11_by_11_2d_grid,
                             start_state
                             )
+
+    def test_normal_start_state(self):
+        state_space = ((-5, 5), (-5, 5))
+        start_state = ((5,-5), (0,0))
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        env = src.env.Env(state_space,
+                          action_space,
+                          reward_11_by_11_2d_grid,
+                          transition_11_by_11_2d_grid,
+                          start_state)
+        self.assertEqual(start_state, env.current_state)
 
     def test_bad_action_space(self):
         state_space = ((-5, 5), (-5, 5))
