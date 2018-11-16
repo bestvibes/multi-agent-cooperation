@@ -4,8 +4,8 @@ def transition_2d_grid(state_space: tuple, state: tuple, action: int) -> tuple:
     ACTION_LEFT = 2
     ACTION_RIGHT = 3
 
-    grid_x_bounds = state_space[0] #(-5, 5)
-    grid_y_bounds = state_space[1] #(-5, 5)
+    grid_x_bounds = state_space[0]
+    grid_y_bounds = state_space[1]
 
     current_chaser_state = state[0]
     current_chasee_state = state[1]

@@ -1,7 +1,7 @@
 import unittest
 from src.select_action import select_action
 """
-select_action(state, qtable, epsilon=0)
+select_action(state : tuple, qtable : dict, epsilon=0)
 state: state of the environment, for now (coordinates of chaser, coordinates of target)
 qtable: a dictionary mapping from a state to another dictionary, action2qvalue
     qtable: (state, action2qvalue)
