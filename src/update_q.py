@@ -1,0 +1,17 @@
+import numpy as np
+import random
+import unittest
+
+class UpdateQ:
+    def __init__(self, alpha, gamma):
+        self.alpha = alpha
+        self.gamma = gamma
+
+    def __call__(self, Q_table: dict, state: tuple, action: int, next_state: tuple, reward:int):
+        max_value = np.amax(Q_table[next_state].values())
+        curr_value = Q_table[state][action]
+        Q_table[state][action] = curr_value + self.alpha * (reward + self.gamma * max_value - curr_value)
+
+        return Q_table
+
+
