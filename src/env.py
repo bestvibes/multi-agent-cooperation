@@ -1,4 +1,4 @@
-from collections import Hashable
+from collections.abc import Hashable
 
 class Env(object):
     def __init__(self, state_space: tuple,
