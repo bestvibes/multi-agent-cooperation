@@ -1,5 +1,5 @@
 import unittest
-from select_action import select_action
+from src.select_action import select_action
 """
 select_action(state, qtable, epsilon=0)
 state: state of the environment, for now (coordinates of chaser, coordinates of target)

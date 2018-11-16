@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from update_q import UpdateQ
+from src.update_q import UpdateQ
 
 class TestUpdateQ(unittest.TestCase):
     def setUp(self):
@@ -26,11 +26,7 @@ class TestUpdateQ(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-
     suite.addTest(TestUpdateQ('test_computation'))
-
-
-
     return suite
 
 if __name__ == '__main__':
