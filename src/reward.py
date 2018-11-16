@@ -12,9 +12,7 @@ def two_agent_chasing_reward_nd_grid(state: tuple, action: int, next_state: tupl
 
     chaser_chasee_l2_dist = math.sqrt(sum(map(lambda d: d**2, dim_dists)))
 
-    if state == next_state: # if we stepped out of bounds
-        return OUT_OF_BOUNDS_REWARD
-    elif chaser_chasee_l2_dist == 0:
+    if chaser_chasee_l2_dist == 0:
         return GOAL_REWARD
     else:
         return -chaser_chasee_l2_dist

@@ -33,7 +33,7 @@ class TestTwoAgentChasingRewardNdGrid(unittest.TestCase):
         next_state = ((-5,4), (3,4))
         reward = self.reward_func(curr_state, action, next_state)
 
-        self.assertEqual(reward, src.reward.OUT_OF_BOUNDS_REWARD)
+        self.assertEqual(reward, -8)
 
 if __name__ == '__main__':
     unittest.main()
