@@ -28,9 +28,9 @@ class TestSelectAction(unittest.TestCase):
         invalid_state0 = (0,0)
         invalid_state1 = ((0,0))
         invalid_state2 = ((0,0),(0,1))
-        self.assertEqual(select_action(invalid_state0, self.qtable), -1)
-        self.assertEqual(select_action(invalid_state1, self.qtable), -1)
-        self.assertEqual(select_action(invalid_state2, self.qtable), -1)
+        self.assertRaises(KeyError, select_action, invalid_state0, self.qtable)
+        self.assertRaises(KeyError, select_action, invalid_state1, self.qtable)
+        self.assertRaises(KeyError, select_action, invalid_state2, self.qtable)
     
     def test_epsilon(self):
         counter = {0:0,1:0,2:0,3:0}
