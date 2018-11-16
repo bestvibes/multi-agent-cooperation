@@ -7,8 +7,8 @@ class UpdateQ:
         self.alpha = alpha
         self.gamma = gamma
 
-    def __call__(self, Q_table, state, action, next_state, reward):
-        max_value = np.max([Q_table[next_state][a] for a in Q_table[next_state]])
+    def __call__(self, Q_table: dict, state: tuple, action: int, next_state: tuple, reward:int):
+        max_value = np.amax(Q_table[next_state].values())
         curr_value = Q_table[state][action]
         Q_table[state][action] = curr_value + self.alpha * (reward + self.gamma * max_value - curr_value)
 
