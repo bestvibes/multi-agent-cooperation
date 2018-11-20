@@ -95,7 +95,7 @@ class TestEnvInit(unittest.TestCase):
     def test_wrong_state_dimensions(self):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((0,0,0), (0,0,0))
-        action_space = [["unhashable type"], ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
         self.assertRaises(ValueError,
                             src.env.Env,
                             state_space,
