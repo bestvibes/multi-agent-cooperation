@@ -5,6 +5,7 @@ class Env(object):
                         action_space: list,
                         reward: callable,
                         transition: callable,
+                        done: callable,
                         start_state: tuple):
 
         if not all(map(lambda a: isinstance(a, Hashable), action_space)):
@@ -22,6 +23,7 @@ class Env(object):
         self.action_space = action_space
         self.reward = reward
         self.transition = transition
+        self.done = done
         self.current_state = start_state
 
     def __call__(self, action: int) -> (tuple, float):
@@ -30,4 +32,4 @@ class Env(object):
 
         self.current_state = next_state
 
-        return (next_state, reward)
+        return (next_state, reward, self.done(next_state))
