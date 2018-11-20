@@ -9,16 +9,19 @@ import src.transition
 class Render():
     def __init__(self, chaser_pos, target_pos, env_size):
         self.env_size = env_size
-        self.target_y = target_pos[1] + self.env_size
-        self.target_x = self.env_size - target_pos[0]
+        self.target_y = target_pos[0] + self.env_size
+        self.target_x = self.env_size - target_pos[1]
+        #self.target_x = self.env_size - target_pos[0]
         
-        self.grid = np.ones((2 * self.env_size+1, 2 * self.env_size + 1))
-        self.grid[self.target_x][self.target_y] = 2
+        #self.grid = np.ones((2 * self.env_size+1, 2 * self.env_size + 1))
+        self.grid = [[' ']*(2 * self.env_size + 1)]*(2 * self.env_size + 1)
+        self.grid = np.asarray(self.grid)
+        self.grid[self.target_x][self.target_y] = 'T'
 
-        chaser_y = chaser_pos[1] + self.env_size
-        chaser_x = self.env_size - chaser_pos[0]
+        chaser_y = chaser_pos[0] + self.env_size
+        chaser_x = self.env_size - chaser_pos[1]
 
-        self.grid[chaser_x][chaser_y] = 0
+        self.grid[chaser_x][chaser_y] = 'A'
 
     def __call__(self):
         print(self.grid)
