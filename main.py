@@ -32,6 +32,12 @@ action_space = np.arange(4)
 # Uncertainy in selecting action
 epsilon = 0.1
 
+# define done function
+def done_chasing(state: tuple) -> bool:
+    chaser_state = state[0]
+    chasee_state = state[1]
+    return chaser_state == chasee_state
+
 def trainer():
     # Initial state
     start_state = ((-5, -5), (0, 0))
@@ -48,7 +54,7 @@ def trainer():
                 for x1 in state_space_1D for y1 in state_space_1D \
                 for x2 in [start_state[1][0]] for y2 in [start_state[1][1]]}
                 #for x2 in state_space_1D for y2 in state_space_1D}
-    
+
     # Training
     training_step = 0
     while(training_step <= max_training_steps):
@@ -57,6 +63,7 @@ def trainer():
                           action_space,
                           src.reward.two_agent_chasing_reward_nd_grid,
                           src.transition.transition_2d_grid,
+                          done_chasing,
                           start_state)
         state = start_state
         episode_step = 0
@@ -68,10 +75,7 @@ def trainer():
             # update Q-table
             Q_table = update_q(Q_table, state, action, next_state, reward)
             # check if agent has reach target
-            if done:
-            #if reward == src.reward.GOAL_REWARD:
-                #print(state, action, next_state, reward, training_step, episode_step)
-                break
+            if done: break
             state = next_state
             episode_step += 1
         training_step += 1
@@ -94,6 +98,7 @@ def runner(Q_table):
                       action_space,
                       src.reward.two_agent_chasing_reward_nd_grid,
                       src.transition.transition_2d_grid,
+                      done_chasing,
                       start_state)
     state = start_state
     render(state, env_size)
@@ -103,9 +108,7 @@ def runner(Q_table):
         state = next_state
         print(i)
         render(state, env_size)
-        if done:
-            print(i+1)
-            break
+        if done: break
 
 def main():
     Q_table = trainer()
