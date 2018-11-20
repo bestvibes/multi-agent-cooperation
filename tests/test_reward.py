@@ -1,4 +1,5 @@
 import unittest
+import math
 
 import src.reward
 
@@ -77,6 +78,22 @@ class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
         self.assertRaises(ValueError,
                             src.reward.TwoAgentChasingRewardNdGridWithObstacles,
                             bad_obstacles)
+
+    def test_get_off_obstacle(self):
+        curr_state = ((2,2), (3,4))
+        action = ACTION_DOWN
+        next_state = ((2,1), (3,4))
+        reward = self.reward_func(curr_state, action, next_state)
+
+        self.assertEqual(reward, -math.sqrt(10))
+
+    def test_obstacle_precendence_over_goal(self):
+        curr_state = ((2,1), (2,2))
+        action = ACTION_UP
+        next_state = ((2,2), (2,2))
+        reward = self.reward_func(curr_state, action, next_state)
+
+        self.assertEqual(reward, src.reward.OUT_OF_BOUNDS_REWARD)
 
 if __name__ == '__main__':
     unittest.main()
