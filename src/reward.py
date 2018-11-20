@@ -18,7 +18,7 @@ def two_agent_chasing_reward_nd_grid(state: tuple, action: int, next_state: tupl
 
 class TwoAgentChasingRewardNdGridWithObstacles(object):
     def __init__(self, obstacles: list):
-        if not all(map(lambda o: isinstance(o, tuple), obstacles)):
+        if obstacles and not all(map(lambda o: isinstance(o, tuple), obstacles)):
             raise ValueError("Invalid obstacles format!")
 
         self.obstacles = obstacles
@@ -29,7 +29,7 @@ class TwoAgentChasingRewardNdGridWithObstacles(object):
 
         chaser_chasee_l2_dist = get_coordinates_l2_dist(next_chaser_state, next_chasee_state)
 
-        if next_chaser_state in self.obstacles:
+        if self.obstacles and next_chaser_state in self.obstacles:
             return OUT_OF_BOUNDS_REWARD
         elif chaser_chasee_l2_dist == 0:
             return GOAL_REWARD

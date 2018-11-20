@@ -65,6 +65,7 @@ class TestEnvInit(unittest.TestCase):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((6,-6), (0,0))
         action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
         self.assertRaises(ValueError,
                             src.env.Env,
                             state_space,
@@ -72,13 +73,15 @@ class TestEnvInit(unittest.TestCase):
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
                             done_chasing,
-                            start_state
+                            start_state,
+                            obstacles
                             )
 
     def test_bad_action_space(self):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((0,0), (0,0))
         action_space = [["unhashable type"], ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
         self.assertRaises(ValueError,
                             src.env.Env,
                             state_space,
@@ -86,13 +89,15 @@ class TestEnvInit(unittest.TestCase):
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
                             done_chasing,
-                            start_state
+                            start_state,
+                            obstacles
                             )
 
     def test_wrong_state_dimensions(self):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((0,0,0), (0,0,0))
         action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
         self.assertRaises(ValueError,
                             src.env.Env,
                             state_space,
@@ -100,7 +105,56 @@ class TestEnvInit(unittest.TestCase):
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
                             done_chasing,
-                            start_state
+                            start_state,
+                            obstacles
+                            )
+
+    def test_wrong_state_dimensions(self):
+        state_space = ((-5, 5), (-5, 5))
+        start_state = ((0,0,0), (0,0,0))
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
+        self.assertRaises(ValueError,
+                            src.env.Env,
+                            state_space,
+                            action_space,
+                            reward_11_by_11_2d_grid,
+                            transition_11_by_11_2d_grid,
+                            done_chasing,
+                            start_state,
+                            obstacles
+                            )
+
+    def test_first_member_start_on_obstacle(self):
+        state_space = ((-5, 5), (-5, 5))
+        start_state = ((0,0), (0,1))
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = [(0,0)]
+        self.assertRaises(ValueError,
+                            src.env.Env,
+                            state_space,
+                            action_space,
+                            reward_11_by_11_2d_grid,
+                            transition_11_by_11_2d_grid,
+                            done_chasing,
+                            start_state,
+                            obstacles
+                            )
+
+    def test_second_member_start_on_obstacle(self):
+        state_space = ((-5, 5), (-5, 5))
+        start_state = ((0,0), (0,1))
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = [(0,1)]
+        self.assertRaises(ValueError,
+                            src.env.Env,
+                            state_space,
+                            action_space,
+                            reward_11_by_11_2d_grid,
+                            transition_11_by_11_2d_grid,
+                            done_chasing,
+                            start_state,
+                            obstacles
                             )
 
 class TestEnvStep(unittest.TestCase):
@@ -108,12 +162,14 @@ class TestEnvStep(unittest.TestCase):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((0,0), (0,0))
         action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
         self.env = src.env.Env(state_space,
                                     action_space,
                                     reward_11_by_11_2d_grid,
                                     transition_11_by_11_2d_grid,
                                     done_chasing,
-                                    start_state)
+                                    start_state,
+                                    obstacles)
 
     def test_step(self):
         next_state, reward, done = self.env(ACTION_LEFT)
