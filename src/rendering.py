@@ -22,3 +22,4 @@ class Render():
 
     def __call__(self):
         print('\n'.join(map(lambda x: ' '.join(x), self.grid)))
+        return self.grid
