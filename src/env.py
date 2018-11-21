@@ -20,7 +20,7 @@ class Env(object):
 
         for agent_pos in start_state:
             for dim, dim_pos in enumerate(agent_pos):
-                if dim_pos <= state_space[dim][0] or dim_pos >= state_space[dim][1]:
+                if dim_pos < state_space[dim][0] or dim_pos > state_space[dim][1]:
                     raise ValueError("env: start state out of state space bounds!")
 
         self.state_space = state_space
@@ -32,7 +32,7 @@ class Env(object):
         self.obstacles = obstacles
 
     def __call__(self, action: int) -> (tuple, float):
-        next_state = self.transition(self.current_state, action)
+        next_state = self.transition(self.state_space, self.current_state, action)
         reward = self.reward(self.current_state, action, next_state)
 
         self.current_state = next_state
