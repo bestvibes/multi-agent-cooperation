@@ -83,6 +83,7 @@ class TestEnvInit(unittest.TestCase):
                           action_space,
                           reward_11_by_11_2d_grid,
                           transition_11_by_11_2d_grid,
+                          done_chasing,
                           start_state)
         self.assertEqual(start_state, env.current_state)
 
