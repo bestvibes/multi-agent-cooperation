@@ -24,10 +24,10 @@ def reward_11_by_11_2d_grid(state: tuple, action: int, next_state: tuple) -> flo
     else:
         return -chaser_chasee_dist
 
-def transition_11_by_11_2d_grid(state: tuple, action: int) -> tuple:
-    grid_x_bounds = (-5, 5)
-    grid_y_bounds = (-5, 5)
-
+def transition_11_by_11_2d_grid(state_space: tuple, state: tuple, action: int) -> tuple:
+    grid_x_bounds = state_space[0] #(-5, 5)
+    grid_y_bounds = state_space[1] #(-5, 5)
+    
     current_chaser_state = state[0]
     current_chasee_state = state[1]
 
@@ -54,6 +54,12 @@ def transition_11_by_11_2d_grid(state: tuple, action: int) -> tuple:
 
     return (new_chaser_state, current_chasee_state)
 
+def done_chasing(state: tuple) -> bool:
+    chaser_state = state[0]
+    chasee_state = state[1]
+
+    return chaser_state == chasee_state
+
 class TestEnvInit(unittest.TestCase):
     def test_bad_start_state(self):
         state_space = ((-5, 5), (-5, 5))
@@ -65,8 +71,20 @@ class TestEnvInit(unittest.TestCase):
                             action_space,
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
+                            done_chasing,
                             start_state
                             )
+
+    def test_normal_start_state(self):
+        state_space = ((-5, 5), (-5, 5))
+        start_state = ((5,-5), (0,0))
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        env = src.env.Env(state_space,
+                          action_space,
+                          reward_11_by_11_2d_grid,
+                          transition_11_by_11_2d_grid,
+                          start_state)
+        self.assertEqual(start_state, env.current_state)
 
     def test_bad_action_space(self):
         state_space = ((-5, 5), (-5, 5))
@@ -78,19 +96,21 @@ class TestEnvInit(unittest.TestCase):
                             action_space,
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
+                            done_chasing,
                             start_state
                             )
 
     def test_wrong_state_dimensions(self):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((0,0,0), (0,0,0))
-        action_space = [["unhashable type"], ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
         self.assertRaises(ValueError,
                             src.env.Env,
                             state_space,
                             action_space,
                             reward_11_by_11_2d_grid,
                             transition_11_by_11_2d_grid,
+                            done_chasing,
                             start_state
                             )
 
@@ -103,24 +123,29 @@ class TestEnvStep(unittest.TestCase):
                                     action_space,
                                     reward_11_by_11_2d_grid,
                                     transition_11_by_11_2d_grid,
+                                    done_chasing,
                                     start_state)
 
     def test_step(self):
-        next_state, reward = self.env(ACTION_LEFT)
+        next_state, reward, done = self.env(ACTION_LEFT)
         self.assertEqual(next_state, ((-1,0), (0,0)))
         self.assertEqual(reward, -1);
+        self.assertFalse(done)
 
-        next_state, reward = self.env(ACTION_DOWN)
+        next_state, reward, done = self.env(ACTION_DOWN)
         self.assertEqual(next_state, ((-1,-1), (0,0)))
         self.assertEqual(reward, -math.sqrt(2));
+        self.assertFalse(done)
 
-        next_state, reward = self.env(ACTION_RIGHT)
+        next_state, reward, done = self.env(ACTION_RIGHT)
         self.assertEqual(next_state, ((0,-1), (0,0)))
         self.assertEqual(reward, -1);
+        self.assertFalse(done)
 
-        next_state, reward = self.env(ACTION_UP)
+        next_state, reward, done = self.env(ACTION_UP)
         self.assertEqual(next_state, ((0,0), (0,0)))
         self.assertEqual(reward, 1000);
+        self.assertTrue(done)
 
     def test_step_out_of_bounds(self):
         self.env(ACTION_LEFT)
@@ -128,10 +153,11 @@ class TestEnvStep(unittest.TestCase):
         self.env(ACTION_LEFT)
         self.env(ACTION_LEFT)
         self.env(ACTION_LEFT)
-        next_state, reward = self.env(ACTION_LEFT) # should be out of bounds
+        next_state, reward, done = self.env(ACTION_LEFT) # should be out of bounds
 
         self.assertEqual(next_state, ((-5,0), (0,0)))
         self.assertEqual(reward, -1000); # severely penalize going out of bounds
+        self.assertFalse(done)
 
 if __name__ == '__main__':
     unittest.main()
