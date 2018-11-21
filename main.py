@@ -5,33 +5,14 @@ import src.env
 import src.update_q
 import src.reward
 import src.transition
-
-class Render():
-    def __init__(self, chaser_pos, target_pos, env_size):
-        self.env_size = env_size
-        self.target_y = target_pos[0] + self.env_size
-        self.target_x = self.env_size - target_pos[1]
-        #self.target_x = self.env_size - target_pos[0]
-        
-        #self.grid = np.ones((2 * self.env_size+1, 2 * self.env_size + 1))
-        self.grid = [[' ']*(2 * self.env_size + 1)]*(2 * self.env_size + 1)
-        self.grid = np.asarray(self.grid)
-        self.grid[self.target_x][self.target_y] = 'T'
-
-        chaser_y = chaser_pos[0] + self.env_size
-        chaser_x = self.env_size - chaser_pos[1]
-
-        self.grid[chaser_x][chaser_y] = 'A'
-
-    def __call__(self):
-        print(self.grid)
+import src.rendering
 
 # Environment parameters
 env_size = 5
 state_space_1D = range(-env_size, env_size + 1)
 state_space_bounds = ((-env_size, env_size),)*2
 action_space = np.arange(4)
-obstacles = []
+obstacles = [(-3,-4), (-1,0), (0,-1)]
 
 # Uncertainy in selecting action
 epsilon = 0.1
@@ -65,7 +46,7 @@ def trainer():
         # Initialize environment
         env = src.env.Env(state_space_bounds,
                           action_space,
-                          src.reward.two_agent_chasing_reward_nd_grid,
+                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
                           src.transition.transition_2d_grid,
                           done_chasing,
                           start_state,
@@ -86,8 +67,8 @@ def trainer():
         training_step += 1
     return Q_table   
 
-def render(state, env_size):
-    rendering = Render(state[0], state[1], env_size)
+def render(state, obstacles, env_size):
+    rendering = src.rendering.Render(state[0], state[1], obstacles, env_size)
     time.sleep(0.5)
     rendering()
 
@@ -101,19 +82,19 @@ def runner(Q_table):
     # Intialize environment
     env = src.env.Env(state_space_bounds,
                       action_space,
-                      src.reward.two_agent_chasing_reward_nd_grid,
+                      src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
                       src.transition.transition_2d_grid,
                       done_chasing,
                       start_state,
                       obstacles)
     state = start_state
-    render(state, env_size)
+    render(state, obstacles, env_size)
     for i in range(0, max_running_steps):
         action = src.select_action.select_action(state, Q_table, epsilon)
         next_state, reward, done = env(action)
         state = next_state
         print(i)
-        render(state, env_size)
+        render(state, obstacles, env_size)
         if done: break
 
 def main():
