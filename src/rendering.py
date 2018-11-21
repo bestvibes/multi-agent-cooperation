@@ -5,9 +5,7 @@ class Render():
         self.env_size = env_size
         self.target_y = target_pos[0] + self.env_size
         self.target_x = self.env_size - target_pos[1]
-        #self.target_x = self.env_size - target_pos[0]
         
-        #self.grid = np.ones((2 * self.env_size+1, 2 * self.env_size + 1))
         self.grid = [["."]*(2 * self.env_size + 1)]*(2 * self.env_size + 1)
         self.grid = np.asarray(self.grid)
         self.grid[self.target_x][self.target_y] = 'T'
@@ -23,5 +21,4 @@ class Render():
         self.grid[chaser_x][chaser_y] = 'A'
 
     def __call__(self):
-        #print(self.grid)
         print('\n'.join(map(lambda x: ' '.join(x), self.grid)))
