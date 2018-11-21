@@ -31,6 +31,7 @@ env_size = 5
 state_space_1D = range(-env_size, env_size + 1)
 state_space_bounds = ((-env_size, env_size),)*2
 action_space = np.arange(4)
+obstacles = []
 
 # Uncertainy in selecting action
 epsilon = 0.1
@@ -67,7 +68,8 @@ def trainer():
                           src.reward.two_agent_chasing_reward_nd_grid,
                           src.transition.transition_2d_grid,
                           done_chasing,
-                          start_state)
+                          start_state,
+                          obstacles)
         state = start_state
         episode_step = 0
         while(episode_step <= max_episode_steps):
@@ -102,7 +104,8 @@ def runner(Q_table):
                       src.reward.two_agent_chasing_reward_nd_grid,
                       src.transition.transition_2d_grid,
                       done_chasing,
-                      start_state)
+                      start_state,
+                      obstacles)
     state = start_state
     render(state, env_size)
     for i in range(0, max_running_steps):
