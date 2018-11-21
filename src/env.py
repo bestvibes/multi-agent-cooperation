@@ -6,13 +6,17 @@ class Env(object):
                         reward: callable,
                         transition: callable,
                         done: callable,
-                        start_state: tuple):
+                        start_state: tuple,
+                        obstacles: list):
 
         if not all(map(lambda a: isinstance(a, Hashable), action_space)):
             raise ValueError("env: all actions are not hashable!")
 
         if not all(map(lambda x: len(x) == len(state_space), start_state)):
             raise ValueError("env: start state/state space dimension mismatch!")
+
+        if obstacles and any(map(lambda x: x in obstacles, start_state)):
+            raise ValueError("env: invalid start state, starts on obstacle!")
 
         for agent_pos in start_state:
             for dim, dim_pos in enumerate(agent_pos):
@@ -25,6 +29,7 @@ class Env(object):
         self.transition = transition
         self.done = done
         self.current_state = start_state
+        self.obstacles = obstacles
 
     def __call__(self, action: int) -> (tuple, float):
         next_state = self.transition(self.state_space, self.current_state, action)
