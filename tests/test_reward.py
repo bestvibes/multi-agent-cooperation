@@ -73,6 +73,15 @@ class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
 
         self.assertEqual(reward, src.reward.OUT_OF_BOUNDS_REWARD)
 
+    def test_no_obstacles(self):
+        reward_func = src.reward.TwoAgentChasingRewardNdGridWithObstacles(None)
+        curr_state = ((1,0), (3,4))
+        action = ACTION_UP
+        next_state = ((1,1), (3,4))
+        reward = reward_func(curr_state, action, next_state)
+
+        self.assertEqual(reward, -math.sqrt(13))
+
     def test_invalid_obstacle(self):
         bad_obstacles = ("bad type", (2,2))
         self.assertRaises(ValueError,
