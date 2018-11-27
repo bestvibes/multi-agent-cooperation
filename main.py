@@ -1,5 +1,7 @@
 import numpy as np
 import time
+import copy
+
 import src.select_action
 import src.env
 import src.update_q
@@ -13,25 +15,23 @@ state_space_1D = range(-env_size, env_size + 1)
 state_space_bounds = ((-env_size, env_size),)*2
 action_space = np.arange(4)
 obstacles = [(-3,-4), (-1,0), (0,-1)]
+start_state = ((-5, -5), (0, 0))
 
-# Uncertainy in selecting action
-epsilon = 0.1
+EPSILON = 0.1
 
-# define done function
 def done_chasing(state: tuple) -> bool:
     chaser_state = state[0]
     chasee_state = state[1]
     return chaser_state == chasee_state
 
-def trainer():
-    # Initial state
-    start_state = ((-5, -5), (0, 0))
-    
-    # Training parameters
-    alpha = 0.95
-    gamma = 0.95
-    max_training_steps = 1000
-    max_episode_steps = 25
+def trainer(initial_env,
+            start_state: tuple,
+            alpha: float=0.95,
+            gamma: float=0.95,
+            max_training_steps: int=1000,
+            max_episode_steps: int=25,
+            epsilon: float=EPSILON):
+
     update_q = src.update_q.UpdateQ(alpha, gamma)
     
     # Initialize Q-table randomly.
@@ -44,24 +44,16 @@ def trainer():
     training_step = 0
     while(training_step <= max_training_steps):
         # Initialize environment
-        env = src.env.Env(state_space_bounds,
-                          action_space,
-                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
-                          src.transition.transition_2d_grid,
-                          done_chasing,
-                          start_state,
-                          obstacles)
+        env = copy.deepcopy(initial_env)
         state = start_state
+
         episode_step = 0
         while(episode_step <= max_episode_steps):
-            # select action
             action = src.select_action.select_action(state, Q_table, epsilon)
-            # update environment
             next_state, reward, done = env(action)
-            # update Q-table
             Q_table = update_q(Q_table, state, action, next_state, reward)
-            # check if agent has reach target
             if done: break
+
             state = next_state
             episode_step += 1
         training_step += 1
@@ -72,22 +64,9 @@ def render(state, obstacles, env_size):
     time.sleep(0.5)
     rendering()
 
-def runner(Q_table):
-    # Initial state
-    start_state = ((-5, -5), (0, 0))
-    
-    # Running parameters
-    max_running_steps = 25
-    
-    # Intialize environment
-    env = src.env.Env(state_space_bounds,
-                      action_space,
-                      src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
-                      src.transition.transition_2d_grid,
-                      done_chasing,
-                      start_state,
-                      obstacles)
+def runner(Q_table, env, start_state: tuple, max_running_steps: int=25, epsilon: float=EPSILON):
     state = start_state
+
     render(state, obstacles, env_size)
     for i in range(0, max_running_steps):
         action = src.select_action.select_action(state, Q_table, epsilon)
@@ -98,8 +77,16 @@ def runner(Q_table):
         if done: break
 
 def main():
-    Q_table = trainer()
-    runner(Q_table)
+    env = src.env.Env(state_space_bounds,
+                      action_space,
+                      src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
+                      src.transition.transition_2d_grid,
+                      done_chasing,
+                      start_state,
+                      obstacles)
+
+    Q_table = trainer(env, start_state)
+    runner(Q_table, env, start_state)
 
 if __name__ == '__main__':
     main()
