@@ -81,12 +81,14 @@ class TestEnvInit(unittest.TestCase):
         state_space = ((-5, 5), (-5, 5))
         start_state = ((5,-5), (0,0))
         action_space = [ACTION_DOWN, ACTION_UP, ACTION_LEFT, ACTION_RIGHT]
+        obstacles = None
         env = src.env.Env(state_space,
                           action_space,
                           reward_11_by_11_2d_grid,
                           transition_11_by_11_2d_grid,
                           done_chasing,
-                          start_state)
+                          start_state,
+                          obstacles)
         self.assertEqual(start_state, env.current_state)
 
     def test_bad_action_space(self):

@@ -8,8 +8,8 @@ def main():
 	learning_rate = 1e-4
 
 	# Initilization
-    policy_net = DQN()
-    target_net = DQN()
+	policy_net = DQN()
+	target_net = DQN()
     optimizer = torch.optim.Adam(policy_net.parameters())
 
     while True:
