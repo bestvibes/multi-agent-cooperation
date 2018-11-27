@@ -9,3 +9,6 @@ def get_coordinates_l2_dist(c1: tuple, c2: tuple):
     l2_dist = math.sqrt(sum(map(lambda d: d**2, dim_dists)))
 
     return l2_dist
+
+def list_batch_random_sample(l: list, batch_size: int):
+	return random.sample(l, batch_size)
