@@ -9,14 +9,6 @@ import src.reward
 import src.transition
 import src.rendering
 
-# Environment parameters
-env_size = 5
-state_space_1D = range(-env_size, env_size + 1)
-state_space_bounds = ((-env_size, env_size),)*2
-action_space = np.arange(4)
-obstacles = [(-3,-4), (-1,0), (0,-1)]
-start_state = ((-5, -5), (0, 0))
-
 EPSILON = 0.1
 
 def done_chasing(state: tuple) -> bool:
@@ -24,7 +16,8 @@ def done_chasing(state: tuple) -> bool:
     chasee_state = state[1]
     return chaser_state == chasee_state
 
-def trainer(initial_env,
+def trainer(Q_table: dict,
+            initial_env,
             start_state: tuple,
             alpha: float=0.95,
             gamma: float=0.95,
@@ -33,12 +26,6 @@ def trainer(initial_env,
             epsilon: float=EPSILON):
 
     update_q = src.update_q.UpdateQ(alpha, gamma)
-    
-    # Initialize Q-table randomly.
-    Q_table = {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_space} \
-                for x1 in state_space_1D for y1 in state_space_1D \
-                for x2 in [start_state[1][0]] for y2 in [start_state[1][1]]}
-                #for x2 in state_space_1D for y2 in state_space_1D}
 
     # Training
     training_step = 0
@@ -59,24 +46,39 @@ def trainer(initial_env,
         training_step += 1
     return Q_table   
 
-def render(state, obstacles, env_size):
-    rendering = src.rendering.Render(state[0], state[1], obstacles, env_size)
-    time.sleep(0.5)
-    rendering()
-
-def runner(Q_table, env, start_state: tuple, max_running_steps: int=25, epsilon: float=EPSILON):
+def runner(Q_table: dict,
+            env,
+            start_state: tuple,
+            renderer: callable,
+            max_running_steps: int=25,
+            epsilon: float=EPSILON):
     state = start_state
 
-    render(state, obstacles, env_size)
+    renderer(state)
     for i in range(0, max_running_steps):
         action = src.select_action.select_action(state, Q_table, epsilon)
         next_state, reward, done = env(action)
         state = next_state
         print(i)
-        render(state, obstacles, env_size)
+        renderer(state)
+        time.sleep(0.5)
         if done: break
 
 def main():
+    # Environment parameters
+    env_size = 5
+    state_space_1D = range(-env_size, env_size + 1)
+    state_space_bounds = ((-env_size, env_size),)*2
+    action_space = np.arange(4)
+    obstacles = [(-3,-4), (-1,0), (0,-1)]
+    start_state = ((-5, -5), (0, 0))
+
+    # Initialize Q-table randomly.
+    Q_table = {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_space} \
+                for x1 in state_space_1D for y1 in state_space_1D \
+                for x2 in [start_state[1][0]] for y2 in [start_state[1][1]]}
+                #for x2 in state_space_1D for y2 in state_space_1D}
+
     env = src.env.Env(state_space_bounds,
                       action_space,
                       src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
@@ -85,8 +87,9 @@ def main():
                       start_state,
                       obstacles)
 
-    Q_table = trainer(env, start_state)
-    runner(Q_table, env, start_state)
+    Q_table = trainer(Q_table, env, start_state)
+    renderer = src.rendering.Render2DGrid(obstacles, env_size)
+    runner(Q_table, env, start_state, renderer)
 
 if __name__ == '__main__':
     main()
