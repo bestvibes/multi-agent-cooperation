@@ -9,7 +9,7 @@ import src.transition
 
 EPSILON = 0.1
 
-def init_random_q_table(action_space, state_space_1D, start_state):
+def init_random_q_table(action_space: list, state_space_1D: list, start_state: tuple):
 	# Initialize Q-table randomly.
     return {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_space} \
             for x1 in state_space_1D for y1 in state_space_1D \
@@ -51,6 +51,7 @@ def q_learning_runner(Q_table: dict,
             start_state: tuple,
             renderer: callable,
             max_running_steps: int=25,
+            render_interval: float=0.5,
             epsilon: float=EPSILON):
     state = start_state
 
@@ -61,5 +62,5 @@ def q_learning_runner(Q_table: dict,
         state = next_state
         print(i)
         renderer(state)
-        time.sleep(0.5)
+        time.sleep(render_interval)
         if done: break
