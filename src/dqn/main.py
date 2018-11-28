@@ -54,6 +54,7 @@ def dqn_trainer(initial_env,
 
 			if done: break
 
+			state = next_state
 			episode_step += 1
 
 		# update target network
@@ -64,4 +65,26 @@ def dqn_trainer(initial_env,
 
 	torch.save(policy_net.state_dict(), save_path)
 
+def dqn_runner(env,
+				start_state: tuple,
+				renderer: callable,
+				load_path: str,
+				max_running_steps: int=25,
+				epsilon: int=0.1):
+
+	policy_net = DQN()
+	policy_net.load_state_dict(torch.load(load_path))
+	policy_net.eval()
+
+	state = start_state
+
+    renderer(state)
+    for i in range(0, max_running_steps):
+        action = select_action_dqn(state, policy_net, epsilon)
+        next_state, reward, done = env(action)
+        state = next_state
+        print(i)
+        renderer(state)
+        sleep(0.5)
+        if done: break
     
