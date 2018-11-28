@@ -1,68 +1,13 @@
 import numpy as np
-import time
-import copy
 
-import src.select_action
 import src.env
-import src.update_q
-import src.reward
-import src.transition
 import src.rendering
-
-EPSILON = 0.1
+import src.q_learning
 
 def done_chasing(state: tuple) -> bool:
     chaser_state = state[0]
     chasee_state = state[1]
     return chaser_state == chasee_state
-
-def trainer(Q_table: dict,
-            initial_env,
-            start_state: tuple,
-            alpha: float=0.95,
-            gamma: float=0.95,
-            max_training_steps: int=1000,
-            max_episode_steps: int=25,
-            epsilon: float=EPSILON):
-
-    update_q = src.update_q.UpdateQ(alpha, gamma)
-
-    # Training
-    training_step = 0
-    while(training_step <= max_training_steps):
-        # Initialize environment
-        env = copy.deepcopy(initial_env)
-        state = start_state
-
-        episode_step = 0
-        while(episode_step <= max_episode_steps):
-            action = src.select_action.select_action(state, Q_table, epsilon)
-            next_state, reward, done = env(action)
-            Q_table = update_q(Q_table, state, action, next_state, reward)
-            if done: break
-
-            state = next_state
-            episode_step += 1
-        training_step += 1
-    return Q_table   
-
-def runner(Q_table: dict,
-            env,
-            start_state: tuple,
-            renderer: callable,
-            max_running_steps: int=25,
-            epsilon: float=EPSILON):
-    state = start_state
-
-    renderer(state)
-    for i in range(0, max_running_steps):
-        action = src.select_action.select_action(state, Q_table, epsilon)
-        next_state, reward, done = env(action)
-        state = next_state
-        print(i)
-        renderer(state)
-        time.sleep(0.5)
-        if done: break
 
 def main():
     # Environment parameters
@@ -73,11 +18,7 @@ def main():
     obstacles = [(-3,-4), (-1,0), (0,-1)]
     start_state = ((-5, -5), (0, 0))
 
-    # Initialize Q-table randomly.
-    Q_table = {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_space} \
-                for x1 in state_space_1D for y1 in state_space_1D \
-                for x2 in [start_state[1][0]] for y2 in [start_state[1][1]]}
-                #for x2 in state_space_1D for y2 in state_space_1D}
+    Q_table = src.q_learning.init_random_q_table(action_space, state_space_1D, start_state)
 
     env = src.env.Env(state_space_bounds,
                       action_space,
@@ -87,9 +28,9 @@ def main():
                       start_state,
                       obstacles)
 
-    Q_table = trainer(Q_table, env, start_state)
+    Q_table = src.q_learning.q_learning_trainer(Q_table, env, start_state)
     renderer = src.rendering.Render2DGrid(obstacles, env_size)
-    runner(Q_table, env, start_state, renderer)
+    src.q_learning.q_learning_runner(Q_table, env, start_state, renderer)
 
 if __name__ == '__main__':
     main()
