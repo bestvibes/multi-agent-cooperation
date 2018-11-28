@@ -3,10 +3,9 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 from collections import namedtuple
+# import src.util_types as ut
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
-
-
 class ComputeLoss():
     def __init__(self, batch_size, gamma):
         self.batch_size = batch_size
@@ -18,6 +17,7 @@ class ComputeLoss():
 
         transitions = memory.sample(self.batch_size)
         batch = Transition(*zip(*transitions))
+        print(batch)
 
         state_batch = Variable(torch.cat(batch.state, dim=0))
         next_state_batch = Variable(torch.cat(batch.next_state, dim=0))
