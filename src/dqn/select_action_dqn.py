@@ -2,17 +2,16 @@ import torch
 import numpy as np
 from numpy.random import binomial
 import random
+from util import flatten_tuple
 """
 select_action_dqn
 input: state, policy_net, epsilon
     policy_net
     input: state (tensor)
-    output: 4d (tensor float)
+    output: distribution (tensor list of floats, grad_fn set)
 take the action with maximum value
-output: action (tensor, number)
+output: action (tensor int)
 """
-def flatten_tuple(t: tuple):
-    return list(sum(t, ()))
     
 def select_action_dqn(state : tuple, policy_net, epsilon : float) -> torch.Tensor:
     state_list = flatten_tuple(state)
@@ -25,5 +24,5 @@ def select_action_dqn(state : tuple, policy_net, epsilon : float) -> torch.Tenso
         size = distribution.size()[0]
         action_tensor = torch.tensor(random.randrange(size))
     else:
-        action_tensor = np.argmax(distribution)
+        action_tensor = np.argmax(distribution).detach()
     return action_tensor
