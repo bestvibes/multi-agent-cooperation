@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from numpy.random import binomial
 import random
-from util import flatten_tuple
+from src.util import flatten_tuple
 """
 select_action_dqn
 input: state, policy_net, epsilon

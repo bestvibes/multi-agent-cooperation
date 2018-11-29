@@ -1,6 +1,7 @@
 import unittest
 import torch
-from select_action_dqn import select_action_dqn
+from src.dqn.select_action_dqn import select_action_dqn
+
 """
 select_action_dqn
 input: state, policy_net, epsilon
