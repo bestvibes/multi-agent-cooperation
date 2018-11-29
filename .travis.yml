@@ -5,6 +5,8 @@ before_install:
     - pip install pytest
     - pip install pytest-cov
     - pip install coveralls
+install:
+  - pip install -qr requirements.txt
 script: pytest --cov=src
 after_success:
     - coveralls
