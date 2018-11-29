@@ -6,6 +6,7 @@ from src.replay_memory import ReplayMemoryPusher
 from src.dqn.dqn import DQN
 from src.dqn.optimize_model import ComputeLoss
 from src.dqn.select_action_dqn import select_action_dqn
+from src.util_types import Transition
 
 def dqn_trainer(initial_env,
                 start_state: tuple,
@@ -21,7 +22,7 @@ def dqn_trainer(initial_env,
 
     # Initialization
     memory = []
-    replay_memory_pusher = ReplayMemoryPusher(memory_capacity)
+    replay_memory_pusher = ReplayMemoryPusher(Transition, memory_capacity)
 
     policy_net = DQN()
     target_net = DQN()
