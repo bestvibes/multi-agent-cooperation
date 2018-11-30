@@ -1,4 +1,5 @@
 import copy
+import time
 
 import torch
 
@@ -47,11 +48,13 @@ def dqn_trainer(initial_env,
             # store the transition in memory
             memory = replay_memory_pusher(memory, state, action, next_state, reward)
 
-            # optimize model
-            loss = loss_function(memory, policy_net, target_net)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            if len(memory) >= batch_size:
+                # optimize model
+                loss = loss_function(memory, policy_net, target_net)
+                #print(f"loss: {loss}")
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
             if done: break
 
@@ -63,6 +66,7 @@ def dqn_trainer(initial_env,
             target_net.load_state_dict(policy_net.state_dict())
 
         training_step += 1
+        print(f"train step: {training_step}")
 
     torch.save(policy_net.state_dict(), save_path)
 
@@ -86,6 +90,6 @@ def dqn_runner(env,
         state = next_state
         print(i)
         renderer(state)
-        sleep(0.5)
+        time.sleep(0.5)
         if done: break
     

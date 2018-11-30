@@ -1,21 +1,16 @@
 import torch
-# import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
-from collections import namedtuple
+
 import src.util_types as UT
 import src.util as U
 
-# Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 class ComputeLoss():
     def __init__(self, batch_size, gamma):
         self.batch_size = batch_size
         self.gamma = gamma
     
     def __call__(self, memory, policy_net, target_net):
-        if len(memory) < self.batch_size:
-            return 
-
         transitions = U.list_batch_random_sample(memory, self.batch_size)
         batch = UT.Transition(*zip(*transitions))
         

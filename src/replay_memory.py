@@ -9,11 +9,9 @@ class ReplayMemoryPusher(object):
         self.transition_type = transition_type
 
     def __call__(self, replay_memory: list, *args) -> list:
-        outp = copy.deepcopy(replay_memory)
-
         if len(replay_memory) < self.capacity:
-            return outp + [self.transition_type(*args)]
+            return replay_memory + [self.transition_type(*args)]
 
         random_index = random.randint(0, self.capacity - 1)
-        outp[random_index] = self.transition_type(*args)
-        return outp
+        replay_memory[random_index] = self.transition_type(*args)
+        return replay_memory
