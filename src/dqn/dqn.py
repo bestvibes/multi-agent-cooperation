@@ -1,11 +1,16 @@
+<<<<<<< HEAD
 # import sys
 # sys.path.append('../')
+=======
+from collections import namedtuple
+>>>>>>> 562e9e7986f34d2a46a6786b46637393ae4a172f
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+<<<<<<< HEAD
 from collections import namedtuple
 # from src.replay_memory import ReplayMemoryPusher
 
@@ -17,6 +22,8 @@ from collections import namedtuple
 # TARGET_UPDATE = 10
 
 # Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
+=======
+>>>>>>> 562e9e7986f34d2a46a6786b46637393ae4a172f
 
 class DQN(nn.Module):
     def __init__(self):
