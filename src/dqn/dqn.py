@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from collections import namedtuple
-from src.replay_memory import ReplayMemory
+# from src.replay_memory import ReplayMemoryPusher
 
 # BATCH_SIZE = 128
 # GAMMA = 0.999
