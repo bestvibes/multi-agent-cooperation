@@ -2,11 +2,11 @@ language: python
 python:
     - "3.6"
 before_install:
-    - pip install pytest
-    - pip install pytest-cov
-    - pip install coveralls
+    - pip install pytest --progress-bar off
+    - pip install pytest-cov --progress-bar off
+    - pip install coveralls --progress-bar off
 install:
-  - pip install -qr requirements.txt
+  - pip install -r requirements.txt --progress-bar off
 script: pytest --cov=src
 after_success:
     - coveralls
