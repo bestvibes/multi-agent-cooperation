@@ -36,7 +36,7 @@ class TestQLearningTrainer(unittest.TestCase):
 
         self.env = src.env.Env(state_space_bounds,
                           action_space,
-                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
+                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(state_space_bounds, obstacles),
                           src.transition.transition_2d_grid,
                           done_chasing,
                           self.start_state,
@@ -67,7 +67,7 @@ class TestQLearningRunner(unittest.TestCase):
 
         self.env = src.env.Env(state_space_bounds,
                           action_space,
-                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(obstacles),
+                          src.reward.TwoAgentChasingRewardNdGridWithObstacles(state_space_bounds, obstacles),
                           src.transition.transition_2d_grid,
                           done_chasing,
                           self.start_state,
