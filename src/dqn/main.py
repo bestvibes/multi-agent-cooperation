@@ -5,6 +5,7 @@ import torch
 
 from src.replay_memory import ReplayMemoryPusher
 from src.dqn.dqn import DQN
+from src.dqn.plot import PlotLossAndReward
 from src.dqn.optimize_model import ComputeLoss
 from src.dqn.select_action_dqn import select_action_dqn
 from src.util_types import Transition
@@ -19,11 +20,16 @@ def dqn_trainer(initial_env,
                 max_training_steps: int=1000,
                 max_episode_steps: int=25,
                 epsilon: int=0.1,
-                target_network_update_interval_steps: int=10):
+                target_network_update_interval_steps: int=10,
+                plot_interval: float=0.01):
 
     # Initialization
     memory = []
     replay_memory_pusher = ReplayMemoryPusher(Transition, memory_capacity)
+
+    # For Plotting training curve
+    losses = []
+    returns = []
 
     policy_net = DQN()
     target_net = DQN()
@@ -32,41 +38,48 @@ def dqn_trainer(initial_env,
 
     optimizer = torch.optim.Adam(policy_net.parameters())
     loss_function = ComputeLoss(batch_size, gamma)
+    plot_training_curve = PlotLossAndReward(pause_time=plot_interval)
 
     training_step = 0
     while(training_step <= max_training_steps):
         # reset env
         env = copy.deepcopy(initial_env)
 
+        returns.append(0)
         state = start_state
         episode_step = 0
         while(episode_step <= max_episode_steps):
             action = select_action_dqn(state, policy_net, epsilon)
 
             next_state, reward, done = env(action)
+            returns[-1] += reward
 
             # store the transition in memory
             memory = replay_memory_pusher(memory, state, action, next_state, reward)
 
-            if len(memory) >= batch_size:
-                # optimize model
-                loss = loss_function(memory, policy_net, target_net)
-                #print(f"loss: {loss}")
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+            # optimize model
+            loss = loss_function(memory, policy_net, target_net)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-            if done: break
+            terminal = (episode_step >= max_episode_steps)
+            if done or terminal: 
+                losses.append(loss.data)
+                plot_training_curve(losses, returns)
+                break
 
             state = next_state
             episode_step += 1
+
 
         # update target network
         if (training_step % target_network_update_interval_steps == 0):
             target_net.load_state_dict(policy_net.state_dict())
 
         training_step += 1
-        print(f"train step: {training_step}")
+        if training_step % 50 == 0:
+            print(f"train step: {training_step}")
 
     torch.save(policy_net.state_dict(), save_path)
 
