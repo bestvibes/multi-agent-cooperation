@@ -14,5 +14,5 @@ class PolicyNet(nn.Module):
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
         x = F.relu(self.linear3(x))
-        x = self.linear4(x)
+        x = F.sigmoid(x)
         return x
