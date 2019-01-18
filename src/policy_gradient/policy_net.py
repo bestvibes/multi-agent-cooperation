@@ -1,13 +1,10 @@
-from collections import namedtuple
-
-import numpy as np
-import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
-class DQN(nn.Module):
+
+
+class PolicyNet(nn.Module):
     def __init__(self):
-        super(DQN, self).__init__()
+        super(PolicyNet, self).__init__()
         self.linear1 = nn.Linear(4, 64)
         self.linear2 = nn.Linear(64, 64)
         self.linear3 = nn.Linear(64, 64)
