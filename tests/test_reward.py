@@ -38,8 +38,9 @@ class TestTwoAgentChasingRewardNdGrid(unittest.TestCase):
 
 class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
     def setUp(self):
+        self.state_space = ((-2,2),(-2,2))
         self.obstacles = ((1,1), (2,2))
-        self.reward_func = src.reward.TwoAgentChasingRewardNdGridWithObstacles(self.obstacles)
+        self.reward_func = src.reward.TwoAgentChasingRewardNdGridWithObstacles(self.state_space, self.obstacles)
 
     def test_reach_goal_state(self):
         curr_state = ((-1,0), (0,0))
@@ -63,7 +64,7 @@ class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
         next_state = ((-5,4), (3,4))
         reward = self.reward_func(curr_state, action, next_state)
 
-        self.assertEqual(reward, -8)
+        self.assertEqual(reward, src.reward.OUT_OF_BOUNDS_REWARD)
 
     def test_obstacle(self):
         curr_state = ((1,0), (3,4))
@@ -74,7 +75,7 @@ class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
         self.assertEqual(reward, src.reward.OUT_OF_BOUNDS_REWARD)
 
     def test_no_obstacles(self):
-        reward_func = src.reward.TwoAgentChasingRewardNdGridWithObstacles(None)
+        reward_func = src.reward.TwoAgentChasingRewardNdGridWithObstacles(self.state_space, None)
         curr_state = ((1,0), (3,4))
         action = ACTION_UP
         next_state = ((1,1), (3,4))
@@ -86,6 +87,7 @@ class TestTwoAgentChasingRewardNdGridWithObstacles(unittest.TestCase):
         bad_obstacles = ("bad type", (2,2))
         self.assertRaises(ValueError,
                             src.reward.TwoAgentChasingRewardNdGridWithObstacles,
+                            self.state_space,
                             bad_obstacles)
 
     def test_get_off_obstacle(self):
