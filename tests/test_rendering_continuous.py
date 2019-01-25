@@ -10,6 +10,7 @@ Render_continuous:
         reward_sequence: [R1, R2, .. R(N-1)]
 """
 import numpy as np
+from src.util import get_coordinates_l2_dist
 from src.env_continuous import Env_continuous
 from src.reward_continuous import reward_continuous
 from src.transition_continuous import transition_continuous
@@ -21,7 +22,7 @@ def straight_to_target(state_space, start_state):
     def done_chasing(state: tuple) -> bool:
         chaser_state = state[0][0]
         chasee_state = state[1][0]
-        return chaser_state == chasee_state
+        return get_coordinates_l2_dist(chaser_state, chasee_state) < 0.05
 
     env = Env_continuous(state_space,
                          action_space,
@@ -38,10 +39,11 @@ def straight_to_target(state_space, start_state):
     action = tuple(np.subtract(state[1][0], state[0][0]))
     while not done_cond:
         next_state, reward, done_cond = env(action)
-        action = (0,0)
+        import random
+        action = (random.random() * 10, random.random() * 10)
         state_sequence.append(next_state)
         reward_sequence.append(reward)
-        if next_state == state:
+        if next_state[0][0] == state[0][0]:
             print("Stuck...")
             break
         else:
@@ -49,12 +51,12 @@ def straight_to_target(state_space, start_state):
     
     return state_sequence, reward_sequence
 
-def test_render():
+def test_render(show=False):
     start_state = (((3,4),(0,0)),((15,20),(0,0)))
     state_space = (20, 20)
     state_sequence, reward_sequence = straight_to_target(state_space, start_state)
     render = Render_continuous(state_space, None)
-    return render(state_sequence, reward_sequence)
+    return render(state_sequence, reward_sequence, show=show)
 
 if __name__ == '__main__':
-    anim = test_render()
+    anim = test_render(show=True)
