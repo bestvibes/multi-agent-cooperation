@@ -2,17 +2,18 @@ import unittest
 import numpy as np
 import src.q_learning
 
+from src.util_types import ActionCardinal
+
 class TestRandomQTable(unittest.TestCase):
     def setUp(self):
-        self.action_space = {0, 1, 2, 3}
         self.state_space_1D = range(-1, 2)
         self.start_state = ((0,0), (1,1))
 
     def test_random_q_table(self):
-        Q_table = src.q_learning.init_random_q_table(self.action_space, self.state_space_1D, self.start_state)
+        Q_table = src.q_learning.init_random_q_table(ActionCardinal, self.state_space_1D, self.start_state)
         self.assertEqual(len(Q_table), 3*3)
         for q_values in Q_table.values():
-            self.assertEqual(len(q_values), len(self.action_space))
+            self.assertEqual(len(q_values), len(ActionCardinal))
             for q_value in q_values.values():
                 self.assertTrue(q_value < 1.0)
                 self.assertTrue(q_value >= 0)
@@ -28,14 +29,13 @@ class TestQLearningTrainer(unittest.TestCase):
         env_size = 1
         state_space_1D = range(-env_size, env_size + 1)
         state_space_bounds = ((-env_size, env_size),)*2
-        action_space = np.arange(4)
         obstacles = []
         self.start_state = ((-1, -1), (1, 1))
 
-        self.Q_table = src.q_learning.init_random_q_table(action_space, state_space_1D, self.start_state)
+        self.Q_table = src.q_learning.init_random_q_table(ActionCardinal, state_space_1D, self.start_state)
 
         self.env = src.env.Env(state_space_bounds,
-                          action_space,
+                          ActionCardinal,
                           src.reward.TwoAgentChasingRewardNdGridWithObstacles(state_space_bounds, obstacles),
                           src.transition.transition_2d_grid,
                           done_chasing,
@@ -59,14 +59,13 @@ class TestQLearningRunner(unittest.TestCase):
         env_size = 1
         state_space_1D = range(-env_size, env_size + 1)
         state_space_bounds = ((-env_size, env_size),)*2
-        action_space = np.arange(4)
         obstacles = []
         self.start_state = ((-1, -1), (1, 1))
 
-        self.Q_table = src.q_learning.init_random_q_table(action_space, state_space_1D, self.start_state)
+        self.Q_table = src.q_learning.init_random_q_table(ActionCardinal, state_space_1D, self.start_state)
 
         self.env = src.env.Env(state_space_bounds,
-                          action_space,
+                          ActionCardinal,
                           src.reward.TwoAgentChasingRewardNdGridWithObstacles(state_space_bounds, obstacles),
                           src.transition.transition_2d_grid,
                           done_chasing,

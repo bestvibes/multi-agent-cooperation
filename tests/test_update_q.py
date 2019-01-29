@@ -2,6 +2,8 @@ import unittest
 import numpy as np
 from src.update_q import UpdateQ
 
+from src.util_types import ActionCardinal
+
 class TestUpdateQ(unittest.TestCase):
     def setUp(self):
         alpha = 0.95
@@ -10,15 +12,15 @@ class TestUpdateQ(unittest.TestCase):
 
         self.update = UpdateQ(alpha, gamma)
         self.state_space_1D = range(-env_size, env_size + 1)
-        self.action_space = np.arange(4)
+        self.action_type = ActionCardinal
     
     def test_computation(self):
         state = ((0, 0), (0, 0))
         next_state = ((1, 0), (0, 0))
-        action = 1
+        action = ActionCardinal.LEFT
         reward = 10.0
 
-        Q_table = {((x1, y1), (x2, y2)): {a: 10.0 for a in self.action_space} for x1 in self.state_space_1D for y1 in self.state_space_1D for x2 in self.state_space_1D for y2 in self.state_space_1D}
+        Q_table = {((x1, y1), (x2, y2)): {a: 10.0 for a in self.action_type} for x1 in self.state_space_1D for y1 in self.state_space_1D for x2 in self.state_space_1D for y2 in self.state_space_1D}
         Q_table = self.update(Q_table, state, action, next_state, reward)
         new_value = Q_table[state][action]
         self.assertEqual(new_value, 19.025)

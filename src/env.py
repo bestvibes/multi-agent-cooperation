@@ -1,15 +1,17 @@
 from collections.abc import Hashable
 
+from src.util_types import ActionChaserChasee
+
 class Env(object):
     def __init__(self, state_space: tuple,
-                        action_space: list,
+                        action_type,
                         reward: callable,
                         transition: callable,
                         done: callable,
                         start_state: tuple,
                         obstacles: list):
 
-        if not all(map(lambda a: isinstance(a, Hashable), action_space)):
+        if not all(map(lambda a: isinstance(a, Hashable), action_type)):
             raise ValueError("env: all actions are not hashable!")
 
         if not all(map(lambda x: len(x) == len(state_space), start_state)):
@@ -24,14 +26,14 @@ class Env(object):
                     raise ValueError("env: start state out of state space bounds!")
 
         self.state_space = state_space
-        self.action_space = action_space
+        self.action_type = action_type
         self.reward = reward
         self.transition = transition
         self.done = done
         self.current_state = start_state
         self.obstacles = obstacles
 
-    def __call__(self, action: int) -> (tuple, float):
+    def __call__(self, action: ActionChaserChasee) -> (tuple, float):
         next_state = self.transition(self.state_space, self.current_state, action)
         reward = self.reward(self.current_state, action, next_state)
 

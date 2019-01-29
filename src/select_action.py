@@ -1,9 +1,11 @@
 from numpy.random import binomial
 import random
 
+from src.util_types import ActionCardinal
+
 def select_action(state : tuple,
                   qtable : dict,
-                  epsilon : float = 0) -> int:
+                  epsilon : float = 0) -> ActionCardinal:
     if state not in qtable:
         raise KeyError("State not found in Q-table")
     action2qvalue = qtable[state]

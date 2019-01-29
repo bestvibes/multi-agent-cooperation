@@ -6,12 +6,13 @@ import src.select_action
 import src.update_q
 import src.reward
 import src.transition
+from src.util_types import ActionCardinal, ActionChaserChasee
 
 EPSILON = 0.1
 
-def init_random_q_table(action_space: list, state_space_1D: list, start_state: tuple):
+def init_random_q_table(action_type, state_space_1D: list, start_state: tuple):
 	# Initialize Q-table randomly.
-    return {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_space} \
+    return {((x1, y1), (x2, y2)):{a: np.random.random() for a in action_type} \
             for x1 in state_space_1D for y1 in state_space_1D \
             for x2 in [start_state[1][0]] for y2 in [start_state[1][1]]}
             #for x2 in state_space_1D for y2 in state_space_1D}
@@ -37,8 +38,10 @@ def q_learning_trainer(Q_table: dict,
         episode_step = 0
         while(episode_step <= max_episode_steps):
             action = src.select_action.select_action(state, Q_table, epsilon)
-            next_state, reward, done = env(action)
-            Q_table = update_q(Q_table, state, action, next_state, reward)
+            action_chaser = ActionCardinal(action)
+            action_chaser_chasee = ActionChaserChasee(chaser=action_chaser, chasee=ActionCardinal.STAY)
+            next_state, reward, done = env(action_chaser_chasee)
+            Q_table = update_q(Q_table, state, action_chaser, next_state, reward)
             if done: break
 
             state = next_state
@@ -58,7 +61,8 @@ def q_learning_runner(Q_table: dict,
     renderer(state)
     for i in range(0, max_running_steps):
         action = src.select_action.select_action(state, Q_table, epsilon)
-        next_state, reward, done = env(action)
+        action_chaser_chasee = ActionChaserChasee(chaser=ActionCardinal(action), chasee=ActionCardinal.STAY)
+        next_state, reward, done = env(action_chaser_chasee)
         state = next_state
         print(i)
         renderer(state)

@@ -8,6 +8,7 @@ from src.plot import PlotLossAndReward
 from src.policy_gradient.policy_net import PolicyNet
 from src.policy_gradient.loss_function import policy_gradient_loss_function
 from src.policy_gradient.select_action import select_action_policy_network
+from src.util_types import ActionCardinal, ActionChaserChasee
 
 def policy_gradient_trainer(initial_env,
                 start_state: tuple,
@@ -40,7 +41,10 @@ def policy_gradient_trainer(initial_env,
             action_distribution = torch.distributions.Categorical(action_probabilities)
             action = action_distribution.sample()
 
-            next_state, reward, done = env(action)
+            action_chaser = ActionCardinal(action.item())
+            action_chaser_chasee = ActionChaserChasee(action_chaser, ActionCardinal.STAY)
+
+            next_state, reward, done = env(action_chaser_chasee)
 
             step_history.append((action, reward))
 
@@ -95,7 +99,10 @@ def policy_gradient_runner(env,
         action_distribution = torch.distributions.Categorical(action_probabilities)
         action = action_distribution.sample()
 
-        next_state, reward, done = env(action)
+        action_chaser = ActionCardinal(action.item())
+        action_chaser_chasee = ActionChaserChasee(action_chaser, ActionCardinal.STAY)
+
+        next_state, reward, done = env(action_chaser_chasee)
         state = next_state
         print(i)
         renderer(state)

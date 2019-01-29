@@ -8,7 +8,7 @@ from src.dqn.dqn import DQN
 from src.plot import PlotLossAndReward
 from src.dqn.optimize_model import ComputeLoss
 from src.dqn.select_action_dqn import select_action_dqn
-from src.util_types import Transition
+from src.util_types import Transition, ActionChaserChasee, ActionCardinal
 
 def dqn_trainer(initial_env,
                 start_state: tuple,
@@ -50,8 +50,9 @@ def dqn_trainer(initial_env,
         episode_step = 0
         while(episode_step <= max_episode_steps):
             action = select_action_dqn(state, policy_net, epsilon)
+            action_chaser_chasee = ActionChaserChasee(chaser=ActionCardinal(action.item()), chasee=ActionCardinal.STAY)
 
-            next_state, reward, done = env(action)
+            next_state, reward, done = env(action_chaser_chasee)
             returns[-1] += reward
 
             # store the transition in memory
@@ -99,7 +100,8 @@ def dqn_runner(env,
     renderer(state)
     for i in range(0, max_running_steps):
         action = select_action_dqn(state, policy_net, epsilon)
-        next_state, reward, done = env(action)
+        action_chaser_chasee = ActionChaserChasee(chaser=ActionCardinal(action.item()), chasee=ActionCardinal.STAY)
+        next_state, reward, done = env(action_chaser_chasee)
         state = next_state
         print(i)
         renderer(state)
