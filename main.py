@@ -30,9 +30,9 @@ def main_q_learning():
                       start_state,
                       obstacles)
 
-    Q_table = src.q_learning.q_learning_trainer(Q_table, env, start_state)
+    Q_table = src.q_learning.q_learning_trainer(Q_table, env, start_state, max_training_steps=2000, max_episode_steps=100)
     renderer = src.rendering.Render2DGrid(obstacles, env_size)
-    src.q_learning.q_learning_runner(Q_table, env, start_state, renderer)
+    src.q_learning.q_learning_runner(Q_table, env, start_state, renderer, max_running_steps=100)
 
 def main_dqn():
     model_path = "dqn.st"

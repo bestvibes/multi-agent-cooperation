@@ -4,7 +4,7 @@ from src.util import get_coordinates_l2_dist
 from src.util_types import ActionChaserChasee
 
 GOAL_REWARD = 1000
-OUT_OF_BOUNDS_REWARD = -100
+OUT_OF_BOUNDS_REWARD = -1000
 
 def two_agent_chasing_reward_nd_grid(state: tuple, action: ActionChaserChasee, next_state: tuple) -> float:
     next_chaser_state = next_state[0]
