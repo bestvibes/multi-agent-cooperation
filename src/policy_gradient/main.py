@@ -9,6 +9,7 @@ from src.policy_gradient.policy_net import PolicyNet
 from src.policy_gradient.loss_function import policy_gradient_loss_function
 from src.policy_gradient.select_action import select_action_policy_network
 from src.util_types import ActionCardinal, ActionChaserChasee
+import src.select_action
 
 def policy_gradient_trainer(initial_env,
                 start_state: tuple,
@@ -42,7 +43,8 @@ def policy_gradient_trainer(initial_env,
             action = action_distribution.sample()
 
             action_chaser = ActionCardinal(action.item())
-            action_chaser_chasee = ActionChaserChasee(action_chaser, ActionCardinal.STAY)
+            action_chasee = src.select_action.select_action_chasee(ActionCardinal, state, action_chaser)
+            action_chaser_chasee = ActionChaserChasee(chaser=action_chaser, chasee=action_chasee)
 
             next_state, reward, done = env(action_chaser_chasee)
 
@@ -100,7 +102,8 @@ def policy_gradient_runner(env,
         action = action_distribution.sample()
 
         action_chaser = ActionCardinal(action.item())
-        action_chaser_chasee = ActionChaserChasee(action_chaser, ActionCardinal.STAY)
+        action_chasee = src.select_action.select_action_chasee(ActionCardinal, state, action_chaser)
+        action_chaser_chasee = ActionChaserChasee(chaser=action_chaser, chasee=action_chasee)
 
         next_state, reward, done = env(action_chaser_chasee)
         state = next_state

@@ -79,4 +79,4 @@ def main_policy_gradient():
     policy_gradient_runner(env, start_state, renderer, model_path, max_running_steps=50)
 
 if __name__ == '__main__':
-    main_dqn()
+    main_policy_gradient()
