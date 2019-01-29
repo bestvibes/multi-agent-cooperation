@@ -5,7 +5,7 @@ import torch
 
 from src.replay_memory import ReplayMemoryPusher
 from src.dqn.dqn import DQN
-from src.dqn.plot import PlotLossAndReward
+from src.plot import PlotLossAndReward
 from src.dqn.optimize_model import ComputeLoss
 from src.dqn.select_action_dqn import select_action_dqn
 from src.util_types import Transition

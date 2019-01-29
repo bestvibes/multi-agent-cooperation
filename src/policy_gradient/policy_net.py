@@ -1,3 +1,4 @@
+from torch import sigmoid
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -14,5 +15,6 @@ class PolicyNet(nn.Module):
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
         x = F.relu(self.linear3(x))
-        x = F.sigmoid(x)
+        x = F.relu(self.linear4(x))
+        x = sigmoid(x)
         return x

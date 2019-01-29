@@ -4,18 +4,17 @@ mpl.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 cwd = os.getcwd()
 
-
 class PlotLossAndReward():
-    def __init__(self, pause_time):
+    def __init__(self, pause_time, out_dir=""):
         self.pause_time = 0.001
+        self.out_dir = out_dir
 
     def __call__(self, loss, returns):
         plt.figure(3, figsize=(8, 4))
         plt.clf()
-        plt.title('Learning Curve of DQN')
+        plt.title('Learning Curve')
 
         plt.subplot(131)
         plt.xlabel('Episode')
@@ -33,5 +32,5 @@ class PlotLossAndReward():
         plt.ylabel('Average Returns')
         plt.plot(avg_return, 'b')
 
-        plt.savefig(cwd + '/src/dqn/learning_curve/plot.png')
+        plt.savefig(cwd + '/'+ self.out_dir + '/plot.png')
         plt.pause(self.pause_time)
