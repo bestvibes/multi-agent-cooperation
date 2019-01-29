@@ -11,7 +11,12 @@ class ComputeLoss():
         self.gamma = gamma
     
     def __call__(self, memory, policy_net, target_net):
-        transitions = U.list_batch_random_sample(memory, self.batch_size)
+        
+        if len(memory) >= self.batch_size:
+            transitions = U.list_batch_random_sample(memory, self.batch_size)
+        else:
+            transitions  = U.list_batch_random_sample(memory, len(memory))  
+            
         batch = UT.Transition(*zip(*transitions))
         
         state_batch = torch.Tensor(U.flatten_tuple(batch.state[0]))
