@@ -52,9 +52,9 @@ def main_dqn():
                       start_state,
                       obstacles)
 
-    dqn_trainer(env, start_state, model_path, batch_size=1, max_training_steps=1000, max_episode_steps=50, epsilon=0.05)
+    dqn_trainer(env, start_state, model_path, batch_size=1, max_training_steps=500, max_episode_steps=50, epsilon=0.05)
     renderer = src.rendering.Render2DGrid(obstacles, env_size)
-    dqn_runner(env, start_state, renderer, model_path)
+    dqn_runner(env, start_state, renderer, model_path, max_running_steps=50)
 
 def main_policy_gradient():
     model_path = "policy_gradient.st"
@@ -79,4 +79,4 @@ def main_policy_gradient():
     policy_gradient_runner(env, start_state, renderer, model_path, max_running_steps=50)
 
 if __name__ == '__main__':
-    main_policy_gradient()
+    main_dqn()
