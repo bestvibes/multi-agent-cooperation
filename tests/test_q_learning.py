@@ -11,7 +11,7 @@ class TestRandomQTable(unittest.TestCase):
 
     def test_random_q_table(self):
         Q_table = src.q_learning.init_random_q_table(ActionCardinal, self.state_space_1D, self.start_state)
-        self.assertEqual(len(Q_table), 3*3)
+        self.assertEqual(len(Q_table), (3*3) * (3*3))
         for q_values in Q_table.values():
             self.assertEqual(len(q_values), len(ActionCardinal))
             for q_value in q_values.values():
