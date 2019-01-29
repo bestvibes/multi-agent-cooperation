@@ -21,12 +21,12 @@ class ComputeLoss():
         
         state_batch = torch.Tensor(U.flatten_tuple(batch.state[0]))
         next_state_batch = torch.Tensor(U.flatten_tuple(batch.next_state[0]))
-        action_batch = torch.LongTensor(batch.action) 
-        reward_batch = torch.Tensor(batch.reward)
+        action_batch = (batch.action[0]).type(torch.LongTensor)
+        reward_batch = torch.Tensor(batch.reward[0])
         
         state_action_values = policy_net(state_batch).gather(0, action_batch)
-        next_state_values = target_net(next_state_batch).max(0)[0]      
-        expected_state_action_values = (torch.unsqueeze(next_state_values, 0) * self.gamma) + reward_batch 
+        expected_state_action_values = target_net(next_state_batch).max(0)[0]      
+        expected_state_action_values = (torch.unsqueeze(expected_state_action_values, 0) * self.gamma) + reward_batch 
         expected_state_action_values = Variable(expected_state_action_values.data)
         
         loss = F.mse_loss(state_action_values, expected_state_action_values)

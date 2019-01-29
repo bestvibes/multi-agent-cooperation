@@ -10,7 +10,7 @@ class TestComputerLoss(unittest.TestCase):
         self.policy_net = DQN()
         self.target_net = DQN()
         gamma = 0.95
-        batch_size = 1
+        batch_size = 3
 
         self.cl = ComputeLoss(batch_size, gamma)
     
@@ -19,7 +19,7 @@ class TestComputerLoss(unittest.TestCase):
         next_state = ((1,1), (2,2))
         reward = 1
         action = torch.Tensor([2])[0]
-        memory = [Transition(state, action, next_state, reward)]
+        memory = [Transition(state, action, next_state, reward),Transition(state, action, next_state, reward),Transition(state, action, next_state, reward),Transition(state, action, next_state, reward)]
         loss1 = self.cl(memory, self.policy_net, self.target_net)
         loss2 = self.cl(memory, self.policy_net, self.target_net)
         self.assertEqual(loss1, loss2)
