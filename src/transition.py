@@ -1,23 +1,39 @@
 import sys
+from itertools import starmap
 
-from src.util_types import ActionChaserChasee, ActionCardinal
+from src.util_types import ActionCardinal
 
-def transition_2d_grid(state_space: tuple, state: tuple, action: ActionChaserChasee) -> tuple:
-    grid_x_bounds = state_space[0]
-    grid_y_bounds = state_space[1]
+class Transition2dGridSingleAgentCardinal(object):
+    def __init__(self, state_space: tuple):
+        self.grid_x_bounds = state_space[0]
+        self.grid_y_bounds = state_space[1]
 
-    current_chaser_state = state[0]
-    current_chasee_state = state[1]
+    def __call__(self, state: tuple, action) -> tuple:
 
-    new_chaser_state = _transition_actor(state_space, current_chaser_state, action.chaser)
-    new_chasee_state = _transition_actor(state_space, current_chasee_state, action.chasee)
+        new_state = _transition_actor_cardinal(self.grid_x_bounds, self.grid_y_bounds, state[0], action)
 
-    return (new_chaser_state, new_chasee_state)
+        return (new_state,) + state[1:]
 
-def _transition_actor(state_space: tuple, actor_state: tuple, actor_action: ActionCardinal) -> tuple:
-    grid_x_bounds = state_space[0]
-    grid_y_bounds = state_space[1]
+class Transition2dGridMultiAgentCardinal(object):
+    def __init__(self, state_space: tuple):
+        self.grid_x_bounds = state_space[0]
+        self.grid_y_bounds = state_space[1]
 
+    def __call__(self, state: tuple, actions: list) -> tuple:
+        current_chaser_state = state[0]
+        current_chasee_state = state[1]
+
+        return tuple(starmap(lambda s, a: _transition_actor_cardinal(self.grid_x_bounds, self.grid_y_bounds, s, a), zip(state, actions)))
+
+        # new_chaser_state = self._transition_actor(current_chaser_state, actions[0])
+        # new_chasee_state = self._transition_actor(current_chasee_state, action.chasee)
+
+        # return (new_chaser_state, new_chasee_state)
+
+def _transition_actor_cardinal(grid_x_bounds: tuple,
+                                grid_y_bounds: tuple,
+                                actor_state: tuple,
+                                actor_action: ActionCardinal) -> tuple:
     if actor_action == ActionCardinal.RIGHT:
         if (actor_state[0] + 1) <= grid_x_bounds[1]:
             new_actor_state = (actor_state[0]+1, actor_state[1])
