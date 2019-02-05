@@ -18,13 +18,17 @@ class ComputeLoss():
             transitions  = U.list_batch_random_sample(memory, len(memory))  
             
         batch = UT.Transition(*zip(*transitions))
-        
-        state_batch = torch.Tensor(U.flatten_tuple(batch.state[0]))
-        next_state_batch = torch.Tensor(U.flatten_tuple(batch.next_state[0]))
-        action_batch = (batch.action[0]).type(torch.LongTensor)
-        reward_batch = torch.Tensor(batch.reward[0])
+
+        state_batch = torch.Tensor([U.flatten_tuple(state_tuple) for state_tuple in batch.state])
+        next_state_batch = torch.Tensor([U.flatten_tuple(next_state_tuple) for next_state_tuple in batch.next_state])
+        action_batch = torch.LongTensor([action for action in batch.action])
+        reward_batch = torch.Tensor([reward for reward in batch.reward])
+
+        print(policy_net(state_batch), action_batch)
         
         state_action_values = policy_net(state_batch).gather(0, action_batch)
+        print(policy_net(state_batch), action_batch)
+
         expected_state_action_values = target_net(next_state_batch).max(0)[0]      
         expected_state_action_values = (torch.unsqueeze(expected_state_action_values, 0) * self.gamma) + reward_batch 
         expected_state_action_values = Variable(expected_state_action_values.data)

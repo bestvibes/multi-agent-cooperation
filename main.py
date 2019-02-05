@@ -5,6 +5,7 @@ import src.rendering
 import src.q_learning
 from src.dqn.main import dqn_trainer, dqn_runner
 from src.policy_gradient.main import policy_gradient_trainer, policy_gradient_runner
+from src.control_with_dqn.main import dqn_runner_control, dqn_trainer_control
 
 def done_chasing(state: tuple) -> bool:
     chaser_state = state[0]
@@ -80,5 +81,29 @@ def main_policy_gradient():
     renderer = src.rendering.Render2DGrid(obstacles, env_size)
     policy_gradient_runner(env, start_state, renderer, model_path, max_running_steps=50)
 
+def main_dqn_control():
+    model_path = "dqn_control.st"
+
+    # Environment parameters
+    env_size = 5
+    state_space_1D = range(-env_size, env_size + 1)
+    state_space_bounds = ((-env_size, env_size),)*2
+    action_space = np.arange(4)
+    obstacles = [(-3,-4), (-1,0), (0,-1)]
+    start_state = ((-5, -5), (0, 0))
+    # start_state_list = [-5, -5, 0, 0]
+
+    env = src.env.Env(state_space_bounds,
+                      action_space,
+                      src.reward.TwoAgentChasingRewardNdGridWithObstacles(state_space_bounds, obstacles),
+                      src.transition.transition_2d_grid,
+                      done_chasing,
+                      start_state,
+                      obstacles)
+
+    dqn_trainer_control(env, start_state, model_path, max_training_steps=10, max_episode_steps=50, plot_interval=2)
+    renderer = src.rendering.Render2DGrid(obstacles, env_size)
+    dqn_runner_control(env, start_state, renderer, model_path, max_running_steps=50)
+
 if __name__ == '__main__':
-    main_policy_gradient()
+    main_dqn_control()
