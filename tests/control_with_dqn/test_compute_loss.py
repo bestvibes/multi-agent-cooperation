@@ -1,7 +1,7 @@
 import unittest
 import torch
-from src.dqn.optimize_model import ComputeLoss
-from src.dqn.dqn import DQN
+from src.control_with_dqn.compute_loss import ComputeLoss
+from src.control_with_dqn.dqn import DQN
 from src.util_types import Transition
 
 
@@ -15,10 +15,18 @@ class TestComputerLoss(unittest.TestCase):
         self.cl = ComputeLoss(batch_size, gamma)
     
     def test_same_loss(self):
-        state = ((1,1), (2,2))
-        next_state = ((1,1), (2,2))
-        reward = 1
-        action = torch.Tensor([2])[0]
+        tensor = False
+        if tensor:
+            state = torch.Tensor([1, 2, 3, 4])
+            next_state = torch.Tensor([5, 6, 7, 8])
+            action = torch.Tensor([1.0])
+            reward = torch.Tensor([-1.0])
+        else:
+            state = [1,2,3,4]
+            next_state = [5,6,7,8]
+            reward = -1.0
+            action = 1
+        # memory = [[state, action, next_state, reward], [state, action, next_state, reward], [state, action, next_state, reward]]
         memory = [Transition(state, action, next_state, reward),Transition(state, action, next_state, reward),Transition(state, action, next_state, reward),Transition(state, action, next_state, reward)]
         loss1 = self.cl(memory, self.policy_net, self.target_net)
         loss2 = self.cl(memory, self.policy_net, self.target_net)

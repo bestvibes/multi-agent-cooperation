@@ -28,6 +28,7 @@ class PlotLossAndReward():
 
         plt.subplot(133)
         avg_return = np.array([np.mean(returns[max(0, i-99):i+1]) for i in range(len(returns))])
+        avg_loss = np.array([np.mean(loss[max(0, i-99):i+1]) for i in range(len(loss))])
         plt.xlabel('Episode')
         plt.ylabel('Average Returns')
         plt.plot(avg_return, 'b')
