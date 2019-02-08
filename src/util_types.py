@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from enum import Enum
 
 class ActionCardinal(Enum):
@@ -13,6 +13,6 @@ ActionChaserChasee = NamedTuple('Action', (('chaser', ActionCardinal), ('chasee'
 
 # A single transition structure
 Transition = NamedTuple('Transition', (('state', tuple),
-                                       ('action', ActionChaserChasee),
+                                       ('action', Any),
                                        ('next_state', tuple),
                                        ('reward', float)))

@@ -9,6 +9,7 @@ class Transition2dGridSingleAgentCardinal(object):
         self.grid_y_bounds = state_space[1]
 
     def __call__(self, state: tuple, action) -> tuple:
+        action = ActionCardinal(action) # assume action space is ActionCardinal
 
         new_state = _transition_actor_cardinal(self.grid_x_bounds, self.grid_y_bounds, state[0], action)
 
@@ -23,12 +24,9 @@ class Transition2dGridMultiAgentCardinal(object):
         current_chaser_state = state[0]
         current_chasee_state = state[1]
 
+        actions = list(map(ActionCardinal, actions)) # assume action space is ActionCardinal
+
         return tuple(starmap(lambda s, a: _transition_actor_cardinal(self.grid_x_bounds, self.grid_y_bounds, s, a), zip(state, actions)))
-
-        # new_chaser_state = self._transition_actor(current_chaser_state, actions[0])
-        # new_chasee_state = self._transition_actor(current_chasee_state, action.chasee)
-
-        # return (new_chaser_state, new_chasee_state)
 
 def _transition_actor_cardinal(grid_x_bounds: tuple,
                                 grid_y_bounds: tuple,

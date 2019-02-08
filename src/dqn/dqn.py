@@ -1,7 +1,3 @@
-from collections import namedtuple
-
-import numpy as np
-import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -17,5 +13,5 @@ class DQN(nn.Module):
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
         x = F.relu(self.linear3(x))
-        x = self.linear4(x)
+        x = F.softmax(self.linear4(x))
         return x

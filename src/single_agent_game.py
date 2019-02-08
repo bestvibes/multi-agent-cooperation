@@ -21,6 +21,7 @@ class SingleAgentGame(object):
             episode_step = 0
             while(episode_step <= max_episode_steps):
                 action = self.trainer.select_action(state)
+                #print(action)
                 next_state = self.f_transition(state, action)
                 reward = self.f_reward(state, action, next_state)
 

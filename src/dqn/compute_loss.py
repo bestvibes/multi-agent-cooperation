@@ -16,7 +16,6 @@ class ComputeLoss():
         else:
             transitions  = U.list_batch_random_sample(memory, len(memory)) 
 
-
         batch = UT.Transition(*zip(*transitions))
 
         state_batch = torch.Tensor(batch.state)

@@ -11,7 +11,7 @@ class DummyCardinalRandomPolicy(object):
     def __call__(self, state):
         return ActionCardinal(random.randrange(0, len(ActionCardinal)))
 
-class DummyAlgorithm(Trainer):
+class NoLearningAlgorithm(Trainer):
     def __init__(self, dummy_policy):
         self.policy = dummy_policy
 
@@ -24,5 +24,5 @@ class DummyAlgorithm(Trainer):
     def get_policy(self):
         return self.policy
 
-def dummy_reward(state, action, next_state):
+def zero_reward(state, action, next_state):
     return 0

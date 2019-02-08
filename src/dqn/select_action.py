@@ -16,4 +16,4 @@ def select_action_dqn(state : tuple, policy_net, epsilon : float) -> torch.Tenso
         action_tensor = torch.tensor(random.randrange(size))
     else:
         action_tensor = np.argmax(distribution.detach())
-    return action_tensor
+    return action_tensor.item()
