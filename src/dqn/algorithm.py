@@ -57,7 +57,7 @@ class DQNAlgorithm(Trainer):
         self.plot = PlotLossAndReward(pause_time=plot_interval, filename=plot_filename) if self.should_plot else None
 
     def select_action(self, state):
-        return select_action_dqn(state, self.policy_net, self.epsilon)
+        return self.get_policy()(state)
 
     def train_episode_step(self, state, action, next_state, reward):
         # store the transition in memory

@@ -1,7 +1,7 @@
 import unittest
 import torch
 import numpy as np
-from src.dqn.select_action_dqn import select_action_dqn
+from src.dqn.select_action import select_action_dqn
 from src.dqn.dqn import DQN
 
 """
@@ -43,14 +43,13 @@ class TestSelectAction(unittest.TestCase):
 
     def test_normal_states(self):
         for i in range(0,4):
-            action_tensor = select_action_dqn(self.states[i], self.dummy_policy_net, 0)
-            self.assertEqual(action_tensor.size(), torch.Size([]))
-            self.assertTrue(torch.eq(action_tensor, self.actions[i]))
+            action = select_action_dqn(self.states[i], self.dummy_policy_net, 0)
+            self.assertEqual(action, self.actions[i])
         for i in range(0,4):
             distribution = self.policy_net(states[i])
             ans = np.argmax(distribution.detach())
-            action_tensor = select_action_dqn(self.states[i], self.policy_net, 0)
-            self.assertTrue(torch.eq(action_tensor, ans))
+            action = select_action_dqn(self.states[i], self.policy_net, 0)
+            self.assertEqual(action, ans)
     
     def test_invalid_states(self):
         invalid_state0 = ((0,0),(0,1))

@@ -1,7 +1,7 @@
 import unittest
 import torch
-from src.control_with_dqn.compute_loss import ComputeLoss
-from src.control_with_dqn.dqn import DQN
+from src.dqn.compute_loss import ComputeLoss
+from src.dqn.dqn import DQN
 from src.util_types import Transition
 
 

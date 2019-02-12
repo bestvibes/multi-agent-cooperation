@@ -40,6 +40,7 @@ class TestQLearningPolicy(unittest.TestCase):
         self.policy = src.q_learning.algorithm.QLearningPolicy(qtable)
 
     def test_normal_states(self):
+        self.policy.epsilon = 0
         self.assertEqual(self.policy(self.state0), ActionCardinal.STAY)
         self.assertEqual(self.policy(self.state1), ActionCardinal.UP)
 
@@ -93,19 +94,19 @@ class TestUpdateQ(unittest.TestCase):
 
 class TestQLearningAlgorithm(unittest.TestCase):
     def setUp(self):
-        env_size = 5
+        env_size = 1
         state_space_1D = range(-env_size, env_size + 1)
         state_space_bounds = ((-env_size, env_size),)*2
         self.reward = lambda s, a, ns: 10000 if (a == ActionCardinal.LEFT) else -10000
         self.transition = Transition2dGridSingleAgentCardinal(state_space_bounds)
-        self.start_state = ((0, 5), (0, 0))
+        self.start_state = ((0, 1), (0, 0))
         self.q_table = src.q_learning.util.init_random_q_table_2d_square_2_agents(ActionCardinal, state_space_1D)
         self.trainer = src.q_learning.algorithm.QLearningAlgorithm(self.q_table)
 
     def test_train(self):
-        state = self.start_state
-        for train in range(2000):
-            for episode in range(100):
+        for train in range(100):
+            state = self.start_state
+            for episode in range(50):
                 action = self.trainer.select_action(state)
                 next_state = self.transition(state, action)
                 reward = self.reward(state, action, next_state)
@@ -113,6 +114,8 @@ class TestQLearningAlgorithm(unittest.TestCase):
                 self.trainer.train_episode_step(state, action, next_state, reward)
 
                 state = next_state
+
+            self.trainer.train_training_step()
 
         policy = self.trainer.get_policy()
 
@@ -129,9 +132,7 @@ class TestQLearningAlgorithm(unittest.TestCase):
             counter[action] += 1
             state = next_state
 
-        print(counter[ActionCardinal.LEFT])
-        # at least 25% should be left
-        self.assertTrue(counter[ActionCardinal.LEFT] > 25)
+        self.assertGreater(counter[ActionCardinal.LEFT], 75)
 
 if __name__ == '__main__':
     unittest.main()

@@ -34,6 +34,8 @@ class SingleAgentGame(object):
 
             self.trainer.train_training_step()
             training_step += 1
+            if (training_step % 50 == 0):
+                print(f"training step: {training_step}")
 
         return self.trainer.get_policy()
 
