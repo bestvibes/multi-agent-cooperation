@@ -7,7 +7,6 @@ from src.dqn.compute_loss import ComputeLoss
 from src.replay_memory import ReplayMemoryPusher
 from src.util import flatten_tuple
 from src.util_types import Transition
-from src.plot import PlotLossAndReward
 from src.algorithm import Algorithm
 
 class DQNPolicy(object):
@@ -51,7 +50,11 @@ class TrainDQN(Algorithm):
 
         self.plot_filename = plot_filename
         self.should_plot = plot_filename != ""
-        self.plot = PlotLossAndReward(pause_time=plot_interval, filename=plot_filename) if self.should_plot else None
+        if (self.should_plot):
+            from src.plot import PlotLossAndReward
+            self.plot = PlotLossAndReward(pause_time=plot_interval, filename=plot_filename)
+        else:
+            self.plot = None
 
     def select_action(self, state):
         return DQNPolicy(self.policy_net, self.epsilon)(state)
