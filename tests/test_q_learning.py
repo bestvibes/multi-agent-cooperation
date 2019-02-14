@@ -45,6 +45,7 @@ class TestQLearningPolicy(unittest.TestCase):
         self.assertEqual(self.policy(self.state1), ActionCardinal.UP)
 
     def test_invalid_states(self):
+        self.policy.epsilon = 0
         invalid_state0 = (0,0)
         invalid_state1 = ((0,0))
         invalid_state2 = ((0,0),(0,1))
@@ -101,23 +102,24 @@ class TestQLearningAlgorithm(unittest.TestCase):
         self.transition = Transition2dGridSingleAgentCardinal(state_space_bounds)
         self.start_state = ((0, 1), (0, 0))
         self.q_table = src.q_learning.util.init_random_q_table_2d_square_2_agents(ActionCardinal, state_space_1D)
-        self.trainer = src.q_learning.algorithm.QLearningAlgorithm(self.q_table)
+        self.algorithm = src.q_learning.algorithm.TrainQTable(self.q_table)
 
     def test_train(self):
         for train in range(100):
             state = self.start_state
             for episode in range(50):
-                action = self.trainer.select_action(state)
+                action = self.algorithm.select_action(state)
                 next_state = self.transition(state, action)
                 reward = self.reward(state, action, next_state)
 
-                self.trainer.train_episode_step(state, action, next_state, reward)
+                self.algorithm.train_episode_step(state, action, next_state, reward)
 
                 state = next_state
 
-            self.trainer.train_training_step()
+            self.algorithm.train_training_step()
 
-        policy = self.trainer.get_policy()
+        trained_q_table = self.algorithm.get_policy()
+        policy = src.q_learning.algorithm.QLearningPolicy(trained_q_table, epsilon=0)
 
         counter = {ActionCardinal.UP:0,
                     ActionCardinal.DOWN:0,

@@ -11,7 +11,7 @@ output:
     if the agent intends to go out of bounds, the state does not change
 """
 
-from src.util_types import ActionCardinal, ActionChaserChasee
+from src.util_types import ActionCardinal
 
 class TestTransitionSingleAgentCardinal(unittest.TestCase):
     def setUp(self):
