@@ -2,14 +2,14 @@ import copy
 import time
 from itertools import starmap
 
-from src.trainer import Trainer
+from src.algorithm import Algorithm
 
-class MultiAgentGame(object):
-    def __init__(self, f_transition: callable, f_rewards: list, trainers: list):
-        assert(len(f_rewards) == len(trainers))
+class TrainMultiAgentPolicies(object):
+    def __init__(self, f_transition: callable, f_rewards: list, algorithms: list):
+        assert(len(f_rewards) == len(algorithms))
         self.f_transition = f_transition
         self.f_rewards = f_rewards
-        self.trainers = trainers
+        self.algorithms = algorithms
 
     def __call__(self,
                     start_state,
@@ -22,24 +22,26 @@ class MultiAgentGame(object):
 
             episode_step = 0
             while(episode_step <= max_episode_steps):
-                actions = list(map(lambda t: t.select_action(state), self.trainers))
+                actions = list(map(lambda t: t.select_action(state), self.algorithms))
                 next_state = self.f_transition(state, actions)
                 rewards = list(starmap(lambda rf, a: rf(state, a, next_state), zip(self.f_rewards, actions)))
 
-                list(starmap(lambda t, a, r: t.train_episode_step(state, a, next_state, r), zip(self.trainers, actions, rewards)))
+                list(starmap(lambda t, a, r: t.train_episode_step(state, a, next_state, r), zip(self.algorithms, actions, rewards)))
 
                 if (f_done(next_state)): break
 
                 state = next_state
                 episode_step += 1
 
-            list(map(lambda t: t.train_training_step(), self.trainers))
+            list(map(lambda t: t.train_training_step(), self.algorithms))
             training_step += 1
+            if (training_step % 50 == 0):
+                print(f"training step: {training_step}")
 
-        return list(map(lambda t: t.get_policy(), self.trainers))
+        return list(map(lambda t: t.get_policy(), self.algorithms))
 
-class MultiAgentRunner(object):
-    def __init__(self, policies: list, renderer, f_transition: callable, f_done: callable):
+class RenderMultiAgentPolicies(object):
+    def __init__(self, renderer, policies: list, f_transition: callable, f_done: callable):
         self.policies = policies
         self.renderer = renderer
         self.f_transition = f_transition

@@ -1,7 +1,7 @@
 import random
 
 from src.util_types import ActionCardinal
-from src.trainer import Trainer
+from src.algorithm import Algorithm
 
 class DummyCardinalStationaryPolicy(object):
     def __call__(self, state):
@@ -11,7 +11,7 @@ class DummyCardinalRandomPolicy(object):
     def __call__(self, state):
         return ActionCardinal(random.randrange(0, len(ActionCardinal)))
 
-class NoLearningAlgorithm(Trainer):
+class TrainDummyAgent(Algorithm):
     def __init__(self, dummy_policy):
         self.policy = dummy_policy
 

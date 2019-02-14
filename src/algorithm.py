@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
  
-class Trainer(ABC):
+class Algorithm(ABC):
     def __init__(self):
         super().__init__()
     

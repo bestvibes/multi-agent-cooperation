@@ -9,8 +9,6 @@ class ActionCardinal(Enum):
     RIGHT = 3
     STAY = 4
 
-ActionChaserChasee = NamedTuple('Action', (('chaser', ActionCardinal), ('chasee', ActionCardinal)))
-
 # A single transition structure
 Transition = NamedTuple('Transition', (('state', tuple),
                                        ('action', Any),

@@ -24,3 +24,6 @@ def flatten_tuple(t: tuple):
         return list(chain(*t))
     else:
         return t
+
+def save_nn(neural_net, save_path: str):
+    torch.save(neural_net.state_dict(), save_path)

@@ -1,7 +1,5 @@
 from collections.abc import Hashable
 
-from src.util_types import ActionChaserChasee
-
 class Env(object):
     def __init__(self, state_space: tuple,
                         action_type,
@@ -33,7 +31,7 @@ class Env(object):
         self.current_state = start_state
         self.obstacles = obstacles
 
-    def __call__(self, action: ActionChaserChasee) -> (tuple, float):
+    def __call__(self, action) -> (tuple, float):
         next_state = self.transition(self.state_space, self.current_state, action)
         reward = self.reward(self.current_state, action, next_state)
 

@@ -1,17 +1,18 @@
+import copy
+
 import torch
 
-from src.dqn.dqn import DQN
 from src.dqn.select_action import select_action_dqn
 from src.dqn.compute_loss import ComputeLoss
 from src.replay_memory import ReplayMemoryPusher
 from src.util import flatten_tuple
 from src.util_types import Transition
 from src.plot import PlotLossAndReward
-from src.trainer import Trainer
+from src.algorithm import Algorithm
 
 class DQNPolicy(object):
     def __init__(self,
-                    policy_net: DQN,
+                    policy_net: torch.nn.Module,
                     epsilon: float=0.1):
         self.policy_net = policy_net
         self.epsilon = epsilon
@@ -19,11 +20,9 @@ class DQNPolicy(object):
     def __call__(self, state): # -> action
         return select_action_dqn(state, self.policy_net, self.epsilon)
 
-def save_dqn(policy: DQNPolicy, save_path: str):
-    torch.save(policy.policy_net.state_dict(), save_path)
-
-class DQNAlgorithm(Trainer):
+class TrainDQN(Algorithm):
     def __init__(self,
+                    policy_net: torch.nn.Module,
                     batch_size: int=5,
                     gamma: float=0.999,
                     memory_capacity: int=1000,
@@ -44,10 +43,8 @@ class DQNAlgorithm(Trainer):
         self.returns = []
         self.current_training_step_loss = 0
 
-        self.policy_net = DQN()
-        self.target_net = DQN()
-        self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.target_net.eval()
+        self.policy_net = copy.deepcopy(policy_net)
+        self.target_net = copy.deepcopy(policy_net)
 
         self.optimizer = torch.optim.Adam(self.policy_net.parameters())
         self.loss_function = ComputeLoss(batch_size, gamma)
@@ -57,7 +54,7 @@ class DQNAlgorithm(Trainer):
         self.plot = PlotLossAndReward(pause_time=plot_interval, filename=plot_filename) if self.should_plot else None
 
     def select_action(self, state):
-        return self.get_policy()(state)
+        return DQNPolicy(self.policy_net, self.epsilon)(state)
 
     def train_episode_step(self, state, action, next_state, reward):
         # store the transition in memory
@@ -71,8 +68,9 @@ class DQNAlgorithm(Trainer):
         loss.backward()
         self.optimizer.step()
 
-        self.current_training_step_return += reward
-        self.current_training_step_loss += loss.data
+        if (self.should_plot):
+            self.current_training_step_return += reward
+            self.current_training_step_loss += loss.data
 
         self.episode_step += 1
 
@@ -80,16 +78,14 @@ class DQNAlgorithm(Trainer):
         if (self.training_step % self.target_network_update_interval_steps == 0):
             self.target_net.load_state_dict(self.policy_net.state_dict())
 
-        self.returns.append(self.current_training_step_return)
-        self.current_training_step_return = 0
-
-        self.losses.append(self.current_training_step_loss)
-        self.current_training_step_loss = 0
-
         if (self.should_plot):
+            self.returns.append(self.current_training_step_return)
+            self.current_training_step_return = 0
+            self.losses.append(self.current_training_step_loss)
+            self.current_training_step_loss = 0
             self.plot(self.losses, self.returns)
 
         self.training_step += 1
 
     def get_policy(self):
-        return DQNPolicy(self.policy_net, self.epsilon)
+        return self.policy_net

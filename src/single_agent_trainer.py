@@ -1,13 +1,13 @@
 import copy
 import time
 
-from src.trainer import Trainer
+from src.algorithm import Algorithm
 
-class SingleAgentGame(object):
-    def __init__(self, f_transition: callable, f_reward: callable, trainer: Trainer):
+class TrainSingleAgentPolicy(object):
+    def __init__(self, f_transition: callable, f_reward: callable, algorithm: Algorithm):
         self.f_transition = f_transition
         self.f_reward = f_reward
-        self.trainer = trainer
+        self.algorithm = algorithm
 
     def __call__(self,
                     start_state,
@@ -20,27 +20,27 @@ class SingleAgentGame(object):
 
             episode_step = 0
             while(episode_step <= max_episode_steps):
-                action = self.trainer.select_action(state)
+                action = self.algorithm.select_action(state)
                 #print(action)
                 next_state = self.f_transition(state, action)
                 reward = self.f_reward(state, action, next_state)
 
-                self.trainer.train_episode_step(state, action, next_state, reward)
+                self.algorithm.train_episode_step(state, action, next_state, reward)
 
                 if (f_done(next_state)): break
 
                 state = next_state
                 episode_step += 1
 
-            self.trainer.train_training_step()
+            self.algorithm.train_training_step()
             training_step += 1
             if (training_step % 50 == 0):
                 print(f"training step: {training_step}")
 
-        return self.trainer.get_policy()
+        return self.algorithm.get_policy()
 
-class SingleAgentRunner(object):
-    def __init__(self, policy, renderer, f_transition: callable, f_done: callable):
+class RenderSingleAgentPolicy(object):
+    def __init__(self, renderer, policy, f_transition: callable, f_done: callable):
         self.policy = policy
         self.renderer = renderer if renderer else lambda state: None
         self.f_transition = f_transition

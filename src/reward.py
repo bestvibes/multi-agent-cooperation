@@ -1,7 +1,6 @@
 import math
 
 from src.util import get_coordinates_l2_dist
-from src.util_types import ActionChaserChasee
 
 GOAL_REWARD = 1000
 OUT_OF_BOUNDS_REWARD = -100
@@ -15,7 +14,7 @@ class TwoAgentChasingRewardNdGridWithObstacles(object):
         self.grid_x_bounds = state_space[0]
         self.grid_y_bounds = state_space[1]
 
-    def __call__(self, state: tuple, action: ActionChaserChasee, next_state: tuple) -> float:
+    def __call__(self, state: tuple, action, next_state: tuple) -> float:
         next_chaser_state = next_state[0]
         next_chasee_state = next_state[1]
 
@@ -41,7 +40,7 @@ class TwoAgentChaseeRewardNdGridWithObstacles(object):
         self.grid_x_bounds = state_space[0]
         self.grid_y_bounds = state_space[1]
 
-    def __call__(self, state: tuple, action: ActionChaserChasee, next_state: tuple) -> float:
+    def __call__(self, state: tuple, action, next_state: tuple) -> float:
         next_chaser_state = next_state[0]
         next_chasee_state = next_state[1]
 
