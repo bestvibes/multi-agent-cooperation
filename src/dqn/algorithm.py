@@ -11,17 +11,20 @@ from src.algorithm import Algorithm
 
 class DQNPolicy(object):
     def __init__(self,
-                    policy_net: torch.nn.Module,
+                    policy_model: torch.nn.Module,
+                    parameters,
                     epsilon: float=0.1):
-        self.policy_net = policy_net
+        self.policy_model = policy_model
+        self.parameters = parameters
         self.epsilon = epsilon
 
     def __call__(self, state): # -> action
-        return select_action_dqn(state, self.policy_net, self.epsilon)
+        return select_action_dqn(state, self.policy_model, self.parameters, self.epsilon)
 
 class TrainDQN(Algorithm):
     def __init__(self,
-                    policy_net: torch.nn.Module,
+                    policy_model: torch.nn.Module,
+                    initial_parameters: list,
                     batch_size: int=5,
                     gamma: float=0.999,
                     memory_capacity: int=1000,
@@ -42,10 +45,11 @@ class TrainDQN(Algorithm):
         self.returns = []
         self.current_training_step_loss = 0
 
-        self.policy_net = copy.deepcopy(policy_net)
-        self.target_net = copy.deepcopy(policy_net)
+        self.policy_model = copy.deepcopy(policy_model)
+        self.target_parameters = copy.deepcopy(initial_parameters)
+        self.parameters = copy.deepcopy(initial_parameters)
 
-        self.optimizer = torch.optim.Adam(self.policy_net.parameters())
+        self.optimizer = torch.optim.Adam(self.parameters)
         self.loss_function = ComputeLoss(batch_size, gamma)
 
         self.plot_filename = plot_filename
@@ -57,7 +61,7 @@ class TrainDQN(Algorithm):
             self.plot = None
 
     def select_action(self, state):
-        return DQNPolicy(self.policy_net, self.epsilon)(state)
+        return DQNPolicy(self.policy_model, self.parameters, self.epsilon)(state)
 
     def train_episode_step(self, state, action, next_state, reward):
         # store the transition in memory
@@ -66,7 +70,7 @@ class TrainDQN(Algorithm):
         self.memory = self.replay_memory_pusher(self.memory, state_list, action, next_state_list, reward)
 
         # optimize model
-        loss = self.loss_function(self.memory, self.policy_net, self.target_net)
+        loss = self.loss_function(self.memory, self.policy_model, self.parameters, self.target_parameters)
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -79,7 +83,8 @@ class TrainDQN(Algorithm):
 
     def train_training_step(self):
         if (self.training_step % self.target_network_update_interval_steps == 0):
-            self.target_net.load_state_dict(self.policy_net.state_dict())
+            #print(list(map(lambda x,y: x-y, self.parameters, self.target_parameters)))
+            self.target_parameters = copy.deepcopy(self.parameters)
 
         if (self.should_plot):
             self.returns.append(self.current_training_step_return)
@@ -91,4 +96,4 @@ class TrainDQN(Algorithm):
         self.training_step += 1
 
     def get_policy(self):
-        return self.policy_net
+        return self.parameters
