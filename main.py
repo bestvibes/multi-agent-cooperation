@@ -241,5 +241,47 @@ def dqn_multi():
     runner = RenderMultiAgentPolicies(renderer, [chaser_policy, chasee_policy], transition, done_chasing)
     runner(start_state)
 
+def dqn_cartpole():
+    import gym
+    import numpy as np
+    from src.score_logger import ScoreLogger
+    env = gym.make("CartPole-v1")
+    score_logger = ScoreLogger("CartPole-v1")
+    observation_space = env.observation_space.shape[0]
+    action_space = env.action_space.n
+
+
+    # dqn_solver = DQNSolver(observation_space, action_space)
+    dqn_model = src.nn.ReluLinearNN([nn.functional.linear,
+                                     nn.functional.linear,
+                                     nn.functional.linear])
+    
+    parameters = [*src.nn.create_init_linear_layer_weights_and_bias(4, 24),
+                    *src.nn.create_init_linear_layer_weights_and_bias(24, 24),
+                    *src.nn.create_init_linear_layer_weights_and_bias(24, 2)]
+
+    algorithm = TrainDQN(dqn_model, parameters, gamma=0.95, lr=0.001, memory_capacity=1000000, batch_size=20, plot_filename=f"plot_{inspect.currentframe().f_code.co_name}.png")
+
+    run = 0
+    while True:
+        run += 1
+        state = env.reset()
+        state = np.reshape(state, [1, observation_space])
+        step = 0
+        while True:
+            step += 1
+            env.render()
+            action = algorithm.select_action(state)
+            state_next, reward, terminal, info = env.step(action)
+            reward = reward if not terminal else -reward
+            state_next = np.reshape(state_next, [1, observation_space])
+            algorithm.train_episode_step(state, action, state_next, reward)
+            state = state_next
+            if terminal:
+                print("Run: " + str(run) + ", score: " + str(step))
+                score_logger.add_score(step, run)
+                break
+        algorithm.train_training_step()
+
 if __name__ == '__main__':
-    dqn_multi()
+    dqn_cartpole()

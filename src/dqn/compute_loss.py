@@ -2,7 +2,6 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-import src.util_types as UT
 import src.util as U
 
 class ComputeLoss():
@@ -16,12 +15,12 @@ class ComputeLoss():
         else:
             transitions  = U.list_batch_random_sample(memory, len(memory)) 
 
-        batch = UT.Transition(*zip(*transitions))
+        states, actions, next_states, rewards = zip(*transitions)
 
-        state_batch = torch.Tensor(batch.state)
-        next_state_batch = torch.Tensor(batch.next_state)
-        reward_batch = torch.Tensor(batch.reward)
-        action_batch = torch.LongTensor([[action] for action in batch.action])
+        state_batch = torch.Tensor(states)
+        next_state_batch = torch.Tensor(next_states)
+        reward_batch = torch.Tensor(rewards)
+        action_batch = torch.LongTensor([[action] for action in actions])
 
         state_action_values = policy_model(state_batch, parameters).gather(1, action_batch)
 

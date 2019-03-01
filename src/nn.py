@@ -31,7 +31,24 @@ class ReluSoftmaxNN(nn.Module):
 
     def forward(self, x, parameters):
         assert(len(parameters) == self.num_parameters)
-        for i in range(self.num_layers-1): # skip last softmax layer
+        for i in range(self.num_layers-1): # skip last output layer
             x = F.relu(getattr(self, f"layer{i}")(x, parameters[2*i], bias=parameters[2*i+1]))
 
         return F.softmax(getattr(self, f"layer{self.num_layers-1}")(x, parameters[-2], bias=parameters[-1]))
+
+class ReluLinearNN(nn.Module):
+    def __init__(self, layers):
+        super(ReluLinearNN, self).__init__()
+        # need to set each layer as an attribute to get registered
+        # in pytorch
+        self.num_layers = len(layers)
+        self.num_parameters = 2*self.num_layers # weight+bias per layer
+        for i, layer in enumerate(layers):
+            self.__setattr__(f"layer{i}", layer)
+
+    def forward(self, x, parameters):
+        assert(len(parameters) == self.num_parameters)
+        for i in range(self.num_layers-1): # skip last output layer
+            x = F.relu(getattr(self, f"layer{i}")(x, parameters[2*i], bias=parameters[2*i+1]))
+
+        return getattr(self, f"layer{self.num_layers-1}")(x, parameters[-2], bias=parameters[-1])
