@@ -31,7 +31,7 @@ class TrainDQN(Algorithm):
                     epsilon: float=1.0,
                     epsilon_decay: float=0.995,
                     epsilon_min: float=0.01,
-                    target_network_update_interval_steps: int=10,
+                    target_network_update_interval_steps: int=1,
                     plot_filename: str="",
                     plot_interval: float=0.01):
         self.target_network_update_interval_steps = target_network_update_interval_steps

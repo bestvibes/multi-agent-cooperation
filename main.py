@@ -255,12 +255,14 @@ def dqn_cartpole():
     dqn_model = src.nn.ReluLinearNN([nn.functional.linear,
                                      nn.functional.linear,
                                      nn.functional.linear])
-    
-    parameters = [*src.nn.create_init_linear_layer_weights_and_bias(4, 24),
-                    *src.nn.create_init_linear_layer_weights_and_bias(24, 24),
-                    *src.nn.create_init_linear_layer_weights_and_bias(24, 2)]
 
-    algorithm = TrainDQN(dqn_model, parameters, gamma=0.95, lr=0.001, memory_capacity=1000000, batch_size=20, plot_filename=f"plot_{inspect.currentframe().f_code.co_name}.png")
+    HIDDEN_LAYER_SIZE = 16
+    
+    parameters = [*src.nn.create_init_linear_layer_weights_and_bias(4, HIDDEN_LAYER_SIZE),
+                    *src.nn.create_init_linear_layer_weights_and_bias(HIDDEN_LAYER_SIZE, HIDDEN_LAYER_SIZE),
+                    *src.nn.create_init_linear_layer_weights_and_bias(HIDDEN_LAYER_SIZE, 2)]
+
+    algorithm = TrainDQN(dqn_model, parameters, gamma=0.95, lr=0.01, memory_capacity=1000000, batch_size=20, plot_filename=f"plot_{inspect.currentframe().f_code.co_name}.png")
 
     run = 0
     while True:
