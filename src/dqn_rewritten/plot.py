@@ -9,9 +9,8 @@ def compute_moving_averages(values, window_size):
     return avgs
 
 class PlotTrainingHistoryCartPole():
-    def __init__(self, fig_save_path, filename="cartpole_training_history.png"):
+    def __init__(self, fig_save_path):
         self.fig_save_path = fig_save_path
-        self.filename = filename
         
     def __call__(self, loss_history, score_history, score_avgs):
         plt.figure(3, figsize=(8, 4))
@@ -26,4 +25,4 @@ class PlotTrainingHistoryCartPole():
         plt.plot(score_history, 'g.', markersize=3)
         plt.plot(score_avgs, 'r:', linewidth=3)
         
-        plt.savefig(cwd + '\\'+ self.fig_save_path + '\\' + self.filename)
+        plt.savefig(cwd + '/'+ self.fig_save_path)

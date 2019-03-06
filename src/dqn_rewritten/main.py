@@ -1,16 +1,15 @@
 import numpy as np
 
 # modules for handling memory
-from src.replay_memory import ReplayMemoryPusher
+from src.dqn_rewritten.memory import PushMemory
 from src.dqn_rewritten.sample_from_memory import sample_from_memory
-from src.util_types import Transition
 
 # modules for neural network
 import torch
 import src.dqn_rewritten.net as net
 
 # modules for selecting action
-from src.dqn_rewritten.select_action import select_action, decay_epsilon
+from src.dqn_rewritten.policy import Policy, decay_epsilon
 
 # modules for env
 ENV_NAME = "CartPole-v1"
@@ -19,12 +18,9 @@ import gym
 # modules for visualization
 from src.dqn_rewritten.plot import PlotTrainingHistoryCartPole
 
-# modules for evaluating model
-from src.dqn_rewritten.evaluate_model import evaluate
-
 # hyperparameters
-max_training_steps = 1 #2000
-max_episode_steps = 5 #float('inf')
+max_training_steps = 2000
+max_episode_steps = float('inf')
 learning_rate = 0.005
 batch_size = 30
 eps_max = 1
@@ -38,25 +34,17 @@ target_net_update_period = 3
 AVG_WINDOW = 100
 AVG_THRESHOLD = 195
 model_save_path = "dqn_rewritten.st"
-fig_save_path = "fig"
+fig_save_path = "fig/cartpole_training_history.png"
 report_interval = 100
 max_attempt_num = 1
+render_on = False
 
-def main(eval_only=False):
+def train():
     env = gym.make(ENV_NAME)
     
-    if eval_only:
-        trained_q_net = net.Net()
-        trained_q_net.load_state_dict(torch.load(model_save_path))
-        scores = evaluate(trained_q_net, select_action, env, max_trial_number=50, max_episode_steps=500)
-        print("Evaluation Results:\n\tMean: {}, SD: {:0.3f}\n\tMin: {}, Med: {}, Max: {}"
-              .format(np.mean(scores), np.std(scores), np.min(scores), np.median(scores), np.max(scores)))
-        return
-    
     memory = []
-    replay_memory_pusher = ReplayMemoryPusher(Transition, memory_capacity)
+    push_memory = PushMemory(memory_capacity)
     
-    # Change: Net class, seperate architecture and parameters
     q_net = net.Net()
     target_net = net.Net()
     target_net.load_state_dict(q_net.state_dict())
@@ -77,17 +65,18 @@ def main(eval_only=False):
         done = False
         state = list(env.reset())
         while (episode_step < max_episode_steps and not done):
-            #env.render()
+            if render_on: env.render()
             
-            # Change: polocy(state)->action
-            action = select_action(state, q_net, epsilon)
+            # Change: policy(state)->action
+            policy = Policy(q_net, epsilon)
+            action = policy(state)
             
             next_state, reward, done, _ = env.step(action.item())
             next_state = list(next_state)
             # Change: not obvious
             reward = reward if not done else -reward
             
-            memory = replay_memory_pusher(memory, state, action, next_state, reward)
+            memory = push_memory(memory, state, action, next_state, reward)
             sample = sample_from_memory(memory, batch_size)
             
             # compute loss
@@ -140,7 +129,7 @@ if __name__ == '__main__':
     attempt_history = []
     for i in range(max_attempt_num):
         print("---- Attempt {} ----".format(i))
-        training_steps_taken = main(eval_only=False)
+        training_steps_taken = train()
         attempt_history.append(training_steps_taken)
     print(attempt_history)
-# lr=0.05, [547, 414, 772, 585, 713, 658, 332, 370, 684, 446]
+# lr=0.005, [547, 414, 772, 585, 713, 658, 332, 370, 684, 446]
