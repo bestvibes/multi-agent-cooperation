@@ -1,11 +1,11 @@
 import unittest
 import torch
-from src.control_with_dqn.compute_loss import ComputeLoss
-from src.control_with_dqn.dqn import DQN
+from src.a2c.dqn.compute_loss import ComputeLoss
+from src.a2c.dqn.dqn import DQN
 from src.util_types import Transition
 
 
-class TestComputeLoss(unittest.TestCase):
+class TestComputerLoss(unittest.TestCase):
     def setUp(self):
         self.policy_net = DQN()
         self.target_net = DQN()

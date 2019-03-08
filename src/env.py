@@ -15,8 +15,8 @@ class Env(object):
         if not all(map(lambda x: len(x) == len(state_space), start_state)):
             raise ValueError("env: start state/state space dimension mismatch!")
 
-        if obstacles and any(map(lambda x: x in obstacles, start_state)):
-            raise ValueError("env: invalid start state, starts on obstacle!")
+        # if obstacles and any(map(lambda x: x in obstacles, start_state)):
+        #     raise ValueError("env: invalid start state, starts on obstacle!")
 
         for agent_pos in start_state:
             for dim, dim_pos in enumerate(agent_pos):
@@ -38,3 +38,7 @@ class Env(object):
         self.current_state = next_state
 
         return (next_state, reward, self.done(next_state))
+
+    # Only for debugging purpose
+    def change_start_state(self, new_state):
+        self.current_state = new_state

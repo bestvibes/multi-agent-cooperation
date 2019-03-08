@@ -1,5 +1,6 @@
 import copy
 import time
+import random
 
 import torch
 
@@ -11,18 +12,19 @@ from src.control_with_dqn.select_action import select_action_dqn
 from src.util_types import Transition
 from src.util import flatten_tuple
 
-def dqn_trainer_control(initial_env,
+def dqn_trainer_control(renderer, initial_env,
                 start_state: tuple,
                 save_path: str,
                 learning_rate: float=1e-4,
                 batch_size: int=5,
-                gamma: float=0.999,
-                memory_capacity: int=1000,
+                gamma: float=0.9,
+                memory_capacity: int=10000,
                 max_training_steps: int=1000,
                 max_episode_steps: int=25,
-                epsilon: int=0.1,
+                epsilon: int=0.2,
                 target_network_update_interval_steps: int=10,
-                plot_interval: float=0.01):
+                plot_interval: float=0.01,
+                ):
 
     # Initialization
     memory = []
@@ -33,6 +35,7 @@ def dqn_trainer_control(initial_env,
     returns = []
 
     policy_net = DQN()
+    # policy_net.load_state_dict(torch.load("dqn_control.st"))
     target_net = DQN()
     target_net.load_state_dict(policy_net.state_dict())
     target_net.eval()
@@ -45,45 +48,68 @@ def dqn_trainer_control(initial_env,
     while(training_step <= max_training_steps):
         # reset env
         env = copy.deepcopy(initial_env)
+        start_state = ((random.randint(-5,5), random.randint(-5,5)),(0, 0))
+        env.change_start_state(start_state)
 
         returns.append(0)
+        losses.append(0)
+        
         state = start_state
+        # print(state)
         episode_step = 0
         while(episode_step <= max_episode_steps):
             action = select_action_dqn(state, policy_net, epsilon)
+            # print("ACTION CHOSEN:", action)
+            # renderer(state)
 
             next_state, reward, done = env(action)
+            # print("Curr state", state, "next state: ", next_state)
             returns[-1] += reward
 
             # store the transition in memory
             state_list = flatten_tuple(state)
             next_state_list = flatten_tuple(next_state)
             memory = replay_memory_pusher(memory, state_list, action, next_state_list, reward)
-
+            # print("memory", memory)
             # optimize model
             loss = loss_function(memory, policy_net, target_net)
+            # print("training step", training_step, "episode", episode_step, "loss", loss.item())
+            losses[-1] += loss.item()
+
+
+            # losses.append(loss.item())
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
+            # print("Q_net", list(policy_net.parameters()))
+
             terminal = (episode_step >= max_episode_steps)
             if done or terminal: 
-                losses.append(loss.data)
-                plot_training_curve(losses, returns)
+                # losses.append(loss.item())
+                # plot_training_curve(losses, returns)
                 break
 
             state = next_state
+
+            # print("Training step:", training_step, "episode step:", episode_step, ", return:", returns[-1], ", loss", losses[-1], ", start state:", start_state)
             episode_step += 1
+
+            # renderer(state)
+            # time.sleep(0.5)
 
         # update target network
         if (training_step % target_network_update_interval_steps == 0):
             target_net.load_state_dict(policy_net.state_dict())
 
         training_step += 1
-        if training_step % 1 == 0:
-            print(f"train step: {training_step}")
+        if training_step % 50 == 0:
+            print("Training step:", training_step, ", return:", returns[-1], ", loss", losses[-1], ", start state:", start_state)
+            # plot_training_curve(losses, returns)
+            torch.save(policy_net.state_dict(), save_path)
 
     torch.save(policy_net.state_dict(), save_path)
+    plot_training_curve(losses, returns)
 
 def dqn_runner_control(env,
                 start_state: tuple,
@@ -100,7 +126,7 @@ def dqn_runner_control(env,
 
     renderer(state)
     for i in range(0, max_running_steps):
-        action = select_action_dqn(state, policy_net, epsilon)
+        action = select_action_dqn(state, policy_net, -0.1)
         next_state, reward, done = env(action)
         state = next_state
         print(i)

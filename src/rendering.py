@@ -22,12 +22,14 @@ class Render2DGrid():
         for i in reversed(range(num_agents)):
             y = state[i][0] + self.env_size
             x = self.env_size - state[i][1]
+            # print(x, y)
             self.grid[x][y] = str(i)
         
-        for obs in self.obstacles:
-            obs_y = obs[0] + self.env_size
-            obs_x = self.env_size - obs[1]
-            self.grid[obs_x][obs_y] = OBSTACLE
+        if self.obstacles is not None:
+            for obs in self.obstacles:
+                obs_y = obs[0] + self.env_size
+                obs_x = self.env_size - obs[1]
+                self.grid[obs_x][obs_y] = OBSTACLE
 
         print('\n'.join(map(lambda x: ' '.join(x), self.grid)))
         return self.grid

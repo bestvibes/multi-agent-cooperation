@@ -10,7 +10,9 @@ from src.util_types import Transition
 from src.replay_memory import ReplayMemoryPusher
 
 from src.a2c.dqn.dqn import DQN
-from src.a2c.dqn.optimize_model import ComputeLoss
+from src.a2c.dqn.compute_loss import ComputeLoss
+# from src.control_with_dqn.dqn import DQN
+# from src.control_with_dqn.compute_loss import ComputeLoss
 
 from src.a2c.policy_net import PolicyNet
 from src.a2c.loss_function import policy_gradient_loss_function
@@ -19,6 +21,7 @@ from src.a2c.select_action import select_action_policy_network
 def a2c_trainer(initial_env,
                 start_state: tuple,
                 save_path_policy_net: str,
+                save_path_value_net: str,
                 max_training_steps: int=1000,
                 max_episode_steps: int=25,
                 # policy net parameters
@@ -111,16 +114,17 @@ def a2c_trainer(initial_env,
             print(f"train step: {training_step}")
 
     torch.save(policy_net.state_dict(), save_path_policy_net)
-    #torch.save(Q_net.state_dict(), save_path_Q_net)
+    torch.save(Q_net.state_dict(), save_path_value_net)
 
 def a2c_runner(env,
                start_state: tuple,
                renderer: callable,
-               load_path: str,
+               policy_load_path: str,
+               value_load_path: str,
                max_running_steps: int=25):
 
     policy_net = PolicyNet()
-    policy_net.load_state_dict(torch.load(load_path))
+    policy_net.load_state_dict(torch.load(policy_load_path))
     policy_net.eval()
 
     state = start_state

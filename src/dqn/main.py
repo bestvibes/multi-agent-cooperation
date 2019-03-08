@@ -63,6 +63,8 @@ def dqn_trainer(initial_env,
             loss.backward()
             optimizer.step()
 
+            # print("Q_net", list(policy_net.parameters()))
+
             terminal = (episode_step >= max_episode_steps)
             if done or terminal: 
                 losses.append(loss.data)
