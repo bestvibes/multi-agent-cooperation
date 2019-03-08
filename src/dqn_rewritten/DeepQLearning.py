@@ -12,7 +12,7 @@ class DeepQLearning():
                  done_function,
                  render):
         self.transition_function = transition_function
-        self.done_function = transition_function
+        self.done_function = done_function
         self.reward_function = reward_function
         self.get_initial_state = get_initial_state
         self.render = render
@@ -30,7 +30,8 @@ class DeepQLearning():
                  plot_training_history,
                  model_save_path,
                  target_avg_window,
-                 target_avg):
+                 target_avg,
+                 end_training_if_above_target_avg):
         memory = []
         push_memory = PushMemory(memory_capacity)
         
@@ -48,14 +49,12 @@ class DeepQLearning():
         
         training_step = 0
         while (training_step < max_training_steps):
-            # begining of new episode, reset env
             episode_step = 0
             done = False
             state = self.get_initial_state()
             
-            
             while (episode_step < max_episode_steps and not done):
-                if render_on: self.render()
+                if render_on: self.render(state)
                 
                 policy = Policy(q_net, epsilon)
                 action = policy(state)
@@ -83,7 +82,10 @@ class DeepQLearning():
             episode_length_avgs.append(latest_lengths_avg)
             if training_step % report_interval == 0:
                 print("Training step #{}. Latest Avg Episode Length: {}".format(training_step, latest_lengths_avg))
-            if latest_lengths_avg >= target_avg:
+            
+            above_threshold = latest_lengths_avg >= target_avg
+            end_training =  above_threshold if end_training_if_above_target_avg else not above_threshold
+            if end_training:
                 print("Task solved at training step #{}".format(training_step))
                 break
         

@@ -45,8 +45,8 @@ def train():
     memory = []
     push_memory = PushMemory(memory_capacity)
     
-    q_net = net.Net()
-    target_net = net.Net()
+    q_net = net.Net_4_24_24_2_relu()
+    target_net = net.Net_4_24_24_2_relu()
     target_net.load_state_dict(q_net.state_dict())
     compute_loss = net.ComputeLoss(gamma)
     update_net_parameters = net.UpdateNetParameters(learning_rate)

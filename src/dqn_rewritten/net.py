@@ -3,9 +3,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class Net(nn.Module):
+class Net_4_24_24_2_relu(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
+        super(Net_4_24_24_2_relu, self).__init__()
         self.linear1 = nn.Linear(4, 24)
         self.linear2 = nn.Linear(24, 24)
         self.linear3 = nn.Linear(24, 2)
