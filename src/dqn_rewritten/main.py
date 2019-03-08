@@ -1,4 +1,4 @@
-from src.dqn_rewritten.DeepQLearning import DeepQLearning
+from src.dqn_rewritten.deep_q_learning import DeepQLearning
 from src.dqn_rewritten.plot import PlotTrainingHistoryCartPole
 
 import src.dqn_rewritten.env as env
