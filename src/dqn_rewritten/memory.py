@@ -1,3 +1,5 @@
+import random
+
 class PushMemory(object):
     def __init__(self, capacity: int):
         self.capacity = capacity
@@ -11,3 +13,6 @@ class PushMemory(object):
             self.pointer = (self.pointer+1) % self.capacity
             replay_memory[self.pointer] = (args)
         return replay_memory
+
+def sample_from_memory(memory, size):
+    return random.sample(memory, min(size, len(memory)))
