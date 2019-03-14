@@ -73,8 +73,8 @@ if __name__ == '__main__':
           .format(np.mean(attempt_history), np.std(attempt_history),
                   np.min(attempt_history), np.median(attempt_history), np.max(attempt_history)))
     with open('cartpole_attempt_history.csv', mode='a') as csv_file:
-        employee_writer = csv.writer(csv_file, delimiter=',')
-        employee_writer.writerow(attempt_history)
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        csv_writer.writerow(attempt_history)
     
     
 

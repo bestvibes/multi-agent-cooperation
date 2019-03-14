@@ -1,15 +1,16 @@
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 
 import src.dqn_rewritten.net as net
 from src.dqn_rewritten.policy import Policy
-import src.dqn_rewritten.env as env
-from src.dqn_rewritten.main import model_save_path
+import src.dqn_rewritten.env as env 
 
-max_trial_number = 10
+max_trial_number = 30
 max_episode_steps = 500
-render_on = True
-example_model_path = "example_dqn_rewritten.st"
+render_on = False
+model_save_path = "src/dqn_rewritten/dqn_performance_data/dqn_rewritten5.st"
+fig_save_path = "src/dqn_rewritten/dqn_performance_data/eval_model5.png"
 
 render = env.cartpole_render
 transition_function = env.cartpole_transition_function
@@ -20,7 +21,7 @@ done_function = env.cartpole_done_function
 
 def evaluate_cartpole_control(model_path):
     trained_q_net = net.Net_4_24_24_2_relu()
-    trained_q_net.load_state_dict(torch.load(model_save_path))
+    trained_q_net.load_state_dict(torch.load(model_path))
     scores = []
     trial_number = 0
     while (trial_number < max_trial_number):
@@ -40,10 +41,12 @@ def evaluate_cartpole_control(model_path):
             episode_step += 1
         scores.append(episode_reward_sum)
         trial_number += 1
-    print("Evaluation Results:\n\tMean: {}, SD: {:0.3f}\n\tMin: {}, Med: {}, Max: {}"
-          .format(np.mean(scores), np.std(scores), np.min(scores), np.median(scores), np.max(scores)))
+    summary_txt = "Evaluated over 30 episodes:\nMean: {:0.2f}, SD: {:0.2f}\nMin: {}, Med: {}, Max: {}".format(np.mean(scores), np.std(scores), np.min(scores), np.median(scores), np.max(scores))
+    print(summary_txt)
     
-    return scores
+    plt.hist(scores,30)
+    plt.title(summary_txt)
+    plt.savefig(fig_save_path)
 
 if __name__ == "__main__":
     evaluate_cartpole_control(model_save_path)
